@@ -10,9 +10,6 @@ def main(params):
     print(params['start_date'])
     print(params['end_date'])
 
-    file_name = 'RealTimeConsumption_2021-05.csv'
-    input_file_path = os.path.join(params['data_folder'], file_name)
-
     df = read_demand_data(start_date=params['start_date'],
                           end_date=params['end_date'],
                           data_folder=params['data_folder'])

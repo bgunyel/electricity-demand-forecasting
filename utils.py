@@ -1,11 +1,36 @@
 import datetime
+from dateutil.rrule import rrule, MONTHLY
 import json
+import os
+
 import pandas as pd
 
 
 def read_demand_data(start_date, end_date, data_folder):
-    dummy = -32
 
+    file_name_root = 'RealTimeConsumption'
+    file_extension = 'csv'
+
+    date1 = datetime.date.fromisoformat(start_date)
+    date2 = datetime.date.fromisoformat(end_date)
+
+    d1 = datetime.date(year=date1.year, month=date1.month, day=1)
+    d2 = datetime.date(year=date2.year, month=date2.month + 1, day=1) - datetime.timedelta(days=1)
+    dates = [dt for dt in rrule(MONTHLY, dtstart=d1, until=d2)]
+    file_names_list = [os.path.join(data_folder,
+                                    f'{file_name_root}_{d.year}-{d.month:02d}.{file_extension}') for d in dates]
+
+    out_df = read_monthly_demand_data(file_names_list[0])
+    print(file_names_list[0])
+
+    for i in range(1, len(file_names_list)):
+        f = file_names_list[i]
+        df = read_monthly_demand_data(f)
+        out_df = pd.concat([out_df, df], axis=0, join='outer')
+        print(f)
+
+    out_df = out_df.loc[(out_df.index.date >= date1) & (out_df.index.date <= date2)]
+    return out_df
 
 
 def read_monthly_demand_data(file_path):
@@ -34,10 +59,10 @@ def implement_special_days(df):
     holidays_list = get_holidays(min_date=min_datetime.date(), max_date=max_datetime.date())
 
     out_df = df.copy(deep=True)
-    out_df['holiday'] = 0
+    out_df['holiday'] = False
 
     for holiday in holidays_list:
-        out_df.loc[out_df.index.date == holiday, 'holiday'] = 1
+        out_df.loc[out_df.index.date == holiday, 'holiday'] = True
 
 
     return out_df
@@ -49,7 +74,10 @@ def get_holidays(min_date, max_date):
     year = min_date.year
     month = min_date.month
 
-    holidays = constant_holidays[month]
+    if month in constant_holidays.keys():
+        holidays = constant_holidays[month]
+    else:
+        holidays = []
 
     f = open('./data/sliding_holidays.json')
     data = json.load(f)
@@ -69,8 +97,3 @@ def get_holidays(min_date, max_date):
             out_list.append(d)
 
     return out_list
-
-
-
-
-
