@@ -5,9 +5,10 @@ import os
 
 import pandas as pd
 
+import constants
+
 
 def read_demand_data(start_date, end_date, data_folder):
-
     file_name_root = 'RealTimeConsumption'
     file_extension = 'csv'
 
@@ -21,13 +22,11 @@ def read_demand_data(start_date, end_date, data_folder):
                                     f'{file_name_root}_{d.year}-{d.month:02d}.{file_extension}') for d in dates]
 
     out_df = read_monthly_demand_data(file_names_list[0])
-    print(file_names_list[0])
 
     for i in range(1, len(file_names_list)):
         f = file_names_list[i]
         df = read_monthly_demand_data(f)
         out_df = pd.concat([out_df, df], axis=0, join='outer')
-        print(f)
 
     out_df = out_df.loc[(out_df.index.date >= date1) & (out_df.index.date <= date2)]
     return out_df
@@ -35,19 +34,19 @@ def read_demand_data(start_date, end_date, data_folder):
 
 def read_monthly_demand_data(file_path):
     df = pd.read_csv(file_path)
-    df['Consumption (MWh)'] = df['Consumption (MWh)'].str.replace(',', '').astype(float)
+    df[constants.CONSUMPTION] = df[constants.CONSUMPTION].str.replace(',', '').astype(float)
     df['Date_Time'] = df[['Date', 'Hour']].agg(' '.join, axis=1)
     df['Date_Time'] = pd.to_datetime(df['Date_Time'], dayfirst=True)
     df.drop(columns=['Date', 'Hour'], inplace=True)
     df = df.set_index('Date_Time')
     df.index = pd.to_datetime(df.index)
+    df[constants.WEEK_DAY] = df.index.weekday + 1
 
     df = implement_special_days(df)
     return df
 
 
 def implement_special_days(df):
-
     min_datetime = df.index.min()
     max_datetime = df.index.max()
 
@@ -59,11 +58,10 @@ def implement_special_days(df):
     holidays_list = get_holidays(min_date=min_datetime.date(), max_date=max_datetime.date())
 
     out_df = df.copy(deep=True)
-    out_df['holiday'] = False
+    out_df[constants.HOLIDAY] = False
 
     for holiday in holidays_list:
-        out_df.loc[out_df.index.date == holiday, 'holiday'] = True
-
+        out_df.loc[out_df.index.date == holiday, constants.HOLIDAY] = True
 
     return out_df
 
@@ -79,7 +77,7 @@ def get_holidays(min_date, max_date):
     else:
         holidays = []
 
-    f = open('./data/sliding_holidays.json')
+    f = open(constants.SLIDING_HOLIDAYS_JSON)
     data = json.load(f)
     sliding_holidays = data[str(year)]
     f.close()
@@ -97,3 +95,14 @@ def get_holidays(min_date, max_date):
             out_list.append(d)
 
     return out_list
+
+
+def convert_hourly_to_daily(df):
+    out = pd.DataFrame()
+    out[constants.CONSUMPTION] = df.groupby(df.index.date)[constants.CONSUMPTION].sum()
+    out[constants.HOLIDAY] = df.groupby(df.index.date)[constants.HOLIDAY].sum()
+    out[constants.HOLIDAY] = out[constants.HOLIDAY] > 0
+    out[constants.WEEK_DAY] = df.groupby(df.index.date)[constants.WEEK_DAY].mean().astype('int')
+    return out
+
+
