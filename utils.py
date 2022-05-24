@@ -1,5 +1,5 @@
 import datetime
-from dateutil.rrule import rrule, MONTHLY
+from dateutil.rrule import rrule, MONTHLY, DAILY
 import json
 import os
 
@@ -55,18 +55,67 @@ def implement_special_days(df):
     elif min_datetime.month != max_datetime.month:
         raise Exception(f'Min & max month should be the same within a month -- {min_datetime} & {max_datetime}')
 
-    holidays_list = get_holidays(min_date=min_datetime.date(), max_date=max_datetime.date())
-
     out_df = df.copy(deep=True)
+
+    #################
+    # Schools Closed
+    #################
+
+    out_df[constants.SCHOOLS_CLOSED] = False
+    the_list = [get_special_days_as_a_list(year=min_datetime.year, special_day=constants.SCHOOLS_WINTER_BREAK),
+                get_special_days_as_a_list(year=min_datetime.year, special_day=constants.SCHOOLS_SPRING_BREAK),
+                get_special_days_as_a_list(year=min_datetime.year, special_day=constants.SCHOOLS_SUMMER_BREAK),
+                get_special_days_as_a_list(year=min_datetime.year, special_day=constants.SCHOOLS_AUTUMN_BREAK)]
+
+    for sub_list in the_list:
+        for d in sub_list:
+            if (d >= min_datetime.date()) and (d <= max_datetime.date()):
+                out_df.loc[out_df.index.date == d, constants.SCHOOLS_CLOSED] = True
+
+    ##########################################
+    # Official Holidays (National + Religious)
+    ##########################################
+
     out_df[constants.HOLIDAY] = False
+    holidays_list = get_holidays(min_date=min_datetime.date(), max_date=max_datetime.date())
 
     for holiday in holidays_list:
         out_df.loc[out_df.index.date == holiday, constants.HOLIDAY] = True
+        out_df.loc[out_df.index.date == holiday, constants.SCHOOLS_CLOSED] = True
+
+    ##########
+    # Ramazan
+    ##########
+
+    out_df[constants.RAMAZAN] = False
+    ramazan_days_list = get_special_days_as_a_list(year=min_datetime.year, special_day=constants.RAMAZAN)
+
+    for d in ramazan_days_list:
+        if (d >= min_datetime.date()) and (d <= max_datetime.date()):
+            out_df.loc[out_df.index.date == d, constants.RAMAZAN] = True
+
 
     return out_df
 
 
 def get_holidays(min_date, max_date):
+    out_list = get_constant_holidays(min_date=min_date, max_date=max_date)
+
+    list1 = get_special_days_as_a_list(year=min_date.year, special_day=constants.RAMAZAN_BAYRAM)
+    list2 = get_special_days_as_a_list(year=min_date.year, special_day=constants.KURBAN_BAYRAM)
+
+    for d in list1:
+        if (d <= max_date) and (d >= min_date):
+            out_list.append(d)
+
+    for d in list2:
+        if (d <= max_date) and (d >= min_date):
+            out_list.append(d)
+
+    return out_list
+
+
+def get_constant_holidays(min_date, max_date):
     constant_holidays = {1: [1], 4: [23], 5: [1, 19], 7: [15], 8: [30], 10: [29], 12: [31]}
 
     year = min_date.year
@@ -77,24 +126,29 @@ def get_holidays(min_date, max_date):
     else:
         holidays = []
 
-    f = open(constants.SLIDING_HOLIDAYS_JSON)
-    data = json.load(f)
-    sliding_holidays = data[str(year)]
-    f.close()
-
     out_list = []
     for i in holidays:
         d = datetime.date(year=year, month=month, day=i)
         if (d <= max_date) and (d >= min_date):
             out_list.append(d)
 
-    for s in sliding_holidays:
-        d = datetime.date.fromisoformat(s)
-
-        if (d <= max_date) and (d >= min_date):
-            out_list.append(d)
-
     return out_list
+
+
+def get_special_days_as_a_list(year, special_day):
+    f = open(constants.SLIDING_HOLIDAYS_JSON)
+    data = json.load(f)
+    f.close()
+
+    special_days = data[str(year)][special_day]
+
+    dates = []
+    if (special_days['start'] not in ['TODO', 'NA']) and (special_days['end'] not in ['TODO', 'NA']):
+        d1 = datetime.date.fromisoformat(special_days['start'])
+        d2 = datetime.date.fromisoformat(special_days['end'])
+        dates = [dt.date() for dt in rrule(DAILY, dtstart=d1, until=d2)]
+
+    return dates
 
 
 def convert_hourly_to_daily(df):
@@ -104,5 +158,3 @@ def convert_hourly_to_daily(df):
     out[constants.HOLIDAY] = out[constants.HOLIDAY] > 0
     out[constants.WEEK_DAY] = df.groupby(df.index.date)[constants.WEEK_DAY].mean().astype('int')
     return out
-
-

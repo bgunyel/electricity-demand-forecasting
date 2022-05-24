@@ -18,3 +18,13 @@ FRIDAY: Final = 'Friday'
 SATURDAY: Final = 'Saturday'
 SUNDAY: Final = 'Sunday'
 
+RAMAZAN: Final = 'ramazan'
+RAMAZAN_BAYRAM: Final = 'ramazan_bayram'
+KURBAN_BAYRAM: Final = 'kurban_bayram'
+
+SCHOOLS_CLOSED: Final = 'schools_closed'
+SCHOOLS_WINTER_BREAK: Final = 'schools_winter_break'
+SCHOOLS_SPRING_BREAK: Final = 'schools_spring_break'
+SCHOOLS_SUMMER_BREAK: Final = 'schools_summer_break'
+SCHOOLS_AUTUMN_BREAK: Final = 'schools_autumn_break'
+

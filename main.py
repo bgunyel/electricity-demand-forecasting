@@ -9,7 +9,7 @@ from stats import compute_hourly_averages_for_each_day
 def main(params):
     print(params['name'])
 
-    start_date_before_covid = '2017-01-01'
+    start_date_before_covid = '2019-01-01'
     end_date_before_covid = '2020-03-10'
 
     start_date_after_covid = '2020-03-11'
