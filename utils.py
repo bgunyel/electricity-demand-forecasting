@@ -4,6 +4,7 @@ import json
 import os
 
 import pandas as pd
+import numpy as np
 
 import constants
 
@@ -29,6 +30,8 @@ def read_demand_data(start_date, end_date, data_folder):
         out_df = pd.concat([out_df, df], axis=0, join='outer')
 
     out_df = out_df.loc[(out_df.index.date >= date1) & (out_df.index.date <= date2)]
+    out_df = implement_special_days(out_df)
+
     return out_df
 
 
@@ -42,7 +45,6 @@ def read_monthly_demand_data(file_path):
     df.index = pd.to_datetime(df.index)
     df[constants.WEEK_DAY] = df.index.weekday + 1
 
-    df = implement_special_days(df)
     return df
 
 
@@ -50,89 +52,98 @@ def implement_special_days(df):
     min_datetime = df.index.min()
     max_datetime = df.index.max()
 
-    if min_datetime.year != max_datetime.year:
-        raise Exception(f'Min & max year should be the same within a month -- {min_datetime} & {max_datetime}')
-    elif min_datetime.month != max_datetime.month:
-        raise Exception(f'Min & max month should be the same within a month -- {min_datetime} & {max_datetime}')
+    years_list = np.unique(df.index.year)
 
     out_df = df.copy(deep=True)
 
     #################
+    # Ramazan
+    #
     # Schools Closed
     #################
 
     out_df[constants.SCHOOLS_CLOSED] = False
-    the_list = [get_special_days_as_a_list(year=min_datetime.year, special_day=constants.SCHOOLS_WINTER_BREAK),
-                get_special_days_as_a_list(year=min_datetime.year, special_day=constants.SCHOOLS_SPRING_BREAK),
-                get_special_days_as_a_list(year=min_datetime.year, special_day=constants.SCHOOLS_SUMMER_BREAK),
-                get_special_days_as_a_list(year=min_datetime.year, special_day=constants.SCHOOLS_AUTUMN_BREAK)]
+    out_df[constants.RAMAZAN] = False
 
-    for sub_list in the_list:
-        for d in sub_list:
+    for year in years_list:
+        ramazan_days_list = get_special_days_as_a_list(year=year, special_day=constants.RAMAZAN)
+        the_list = [get_special_days_as_a_list(year=year, special_day=constants.SCHOOLS_WINTER_BREAK),
+                    get_special_days_as_a_list(year=year, special_day=constants.SCHOOLS_SPRING_BREAK),
+                    get_special_days_as_a_list(year=year, special_day=constants.SCHOOLS_SUMMER_BREAK),
+                    get_special_days_as_a_list(year=year, special_day=constants.SCHOOLS_AUTUMN_BREAK)]
+
+        for sub_list in the_list:
+            for d in sub_list:
+                if (d >= min_datetime.date()) and (d <= max_datetime.date()):
+                    out_df.loc[out_df.index.date == d, constants.SCHOOLS_CLOSED] = True
+
+        for d in ramazan_days_list:
             if (d >= min_datetime.date()) and (d <= max_datetime.date()):
-                out_df.loc[out_df.index.date == d, constants.SCHOOLS_CLOSED] = True
+                out_df.loc[out_df.index.date == d, constants.RAMAZAN] = True
+
 
     ##########################################
     # Official Holidays (National + Religious)
     ##########################################
 
     out_df[constants.HOLIDAY] = False
-    holidays_list = get_holidays(min_date=min_datetime.date(), max_date=max_datetime.date())
+    out_df[constants.BEFORE_AFTER_HOLIDAY] = False
+    out_df[constants.BRIDGE_DAY] = False
 
-    for holiday in holidays_list:
-        out_df.loc[out_df.index.date == holiday, constants.HOLIDAY] = True
-        out_df.loc[out_df.index.date == holiday, constants.SCHOOLS_CLOSED] = True
+    for year in years_list:
+        holidays_list = get_holidays(year=year)
 
-    ##########
-    # Ramazan
-    ##########
+        for sub_list in holidays_list:
+            for d in sub_list:
+                day_before = d - datetime.timedelta(days=1)
+                day_after = d + datetime.timedelta(days=1)
 
-    out_df[constants.RAMAZAN] = False
-    ramazan_days_list = get_special_days_as_a_list(year=min_datetime.year, special_day=constants.RAMAZAN)
+                if (d >= min_datetime.date()) and (d <= max_datetime.date()):
+                    out_df.loc[out_df.index.date == d, constants.HOLIDAY] = True
+                    out_df.loc[out_df.index.date == d, constants.SCHOOLS_CLOSED] = True
 
-    for d in ramazan_days_list:
-        if (d >= min_datetime.date()) and (d <= max_datetime.date()):
-            out_df.loc[out_df.index.date == d, constants.RAMAZAN] = True
+                if is_inside(in_date=day_before, min_date=min_datetime.date(), max_date=max_datetime.date()):
+                    out_df.loc[out_df.index.date == day_before, constants.BEFORE_AFTER_HOLIDAY] = True
 
+                    if day_before.isoweekday() == 1:
+                        out_df.loc[out_df.index.date == day_before, constants.BRIDGE_DAY] = True
+
+                if is_inside(in_date=day_after, min_date=min_datetime.date(), max_date=max_datetime.date()):
+                    out_df.loc[out_df.index.date == day_after, constants.BEFORE_AFTER_HOLIDAY] = True
+
+                    if day_after.isoweekday() == 5:
+                        out_df.loc[out_df.index.date == day_after, constants.BRIDGE_DAY] = True
+
+    for year in years_list:
+        holidays_list = get_holidays(year=year)
+
+        for sub_list in holidays_list:
+            for d in sub_list:
+                out_df.loc[out_df.index.date == d, constants.BEFORE_AFTER_HOLIDAY] = False
+                out_df.loc[out_df.index.date == d, constants.BRIDGE_DAY] = False
 
     return out_df
 
 
-def get_holidays(min_date, max_date):
-    out_list = get_constant_holidays(min_date=min_date, max_date=max_date)
-
-    list1 = get_special_days_as_a_list(year=min_date.year, special_day=constants.RAMAZAN_BAYRAM)
-    list2 = get_special_days_as_a_list(year=min_date.year, special_day=constants.KURBAN_BAYRAM)
-
-    for d in list1:
-        if (d <= max_date) and (d >= min_date):
-            out_list.append(d)
-
-    for d in list2:
-        if (d <= max_date) and (d >= min_date):
-            out_list.append(d)
-
-    return out_list
+def is_inside(in_date, min_date, max_date):
+    out = True if (in_date >= min_date) and (in_date <= max_date) else False
+    return out
 
 
-def get_constant_holidays(min_date, max_date):
-    constant_holidays = {1: [1], 4: [23], 5: [1, 19], 7: [15], 8: [30], 10: [29], 12: [31]}
 
-    year = min_date.year
-    month = min_date.month
+def get_holidays(year):
 
-    if month in constant_holidays.keys():
-        holidays = constant_holidays[month]
-    else:
-        holidays = []
+    the_list = [get_constant_holidays(year=year),
+                get_special_days_as_a_list(year=year, special_day=constants.RAMAZAN_BAYRAM),
+                get_special_days_as_a_list(year=year, special_day=constants.KURBAN_BAYRAM)]
 
-    out_list = []
-    for i in holidays:
-        d = datetime.date(year=year, month=month, day=i)
-        if (d <= max_date) and (d >= min_date):
-            out_list.append(d)
+    return the_list
 
-    return out_list
+
+def get_constant_holidays(year):
+    constant_holidays = ['-01-01', '-04-23', '-05-01', '-05-19', '-07-15', '-08-30', '-10-29', '-12-31']
+    out = [datetime.date.fromisoformat(str(year) + s) for s in constant_holidays]
+    return out
 
 
 def get_special_days_as_a_list(year, special_day):
@@ -154,7 +165,22 @@ def get_special_days_as_a_list(year, special_day):
 def convert_hourly_to_daily(df):
     out = pd.DataFrame()
     out[constants.CONSUMPTION] = df.groupby(df.index.date)[constants.CONSUMPTION].sum()
+    out[constants.WEEK_DAY] = df.groupby(df.index.date)[constants.WEEK_DAY].mean().astype('int')
+
     out[constants.HOLIDAY] = df.groupby(df.index.date)[constants.HOLIDAY].sum()
     out[constants.HOLIDAY] = out[constants.HOLIDAY] > 0
-    out[constants.WEEK_DAY] = df.groupby(df.index.date)[constants.WEEK_DAY].mean().astype('int')
+
+
+    out[constants.SCHOOLS_CLOSED] = df.groupby(df.index.date)[constants.SCHOOLS_CLOSED].sum()
+    out[constants.SCHOOLS_CLOSED] = out[constants.SCHOOLS_CLOSED] > 0
+
+    out[constants.RAMAZAN] = df.groupby(df.index.date)[constants.RAMAZAN].sum()
+    out[constants.RAMAZAN] = out[constants.RAMAZAN] > 0
+
+    out[constants.BEFORE_AFTER_HOLIDAY] = df.groupby(df.index.date)[constants.BEFORE_AFTER_HOLIDAY].sum()
+    out[constants.BEFORE_AFTER_HOLIDAY] = out[constants.BEFORE_AFTER_HOLIDAY] > 0
+
+    out[constants.BRIDGE_DAY] = df.groupby(df.index.date)[constants.BRIDGE_DAY].sum()
+    out[constants.BRIDGE_DAY] = out[constants.BRIDGE_DAY] > 0
+
     return out

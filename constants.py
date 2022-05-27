@@ -28,3 +28,6 @@ SCHOOLS_SPRING_BREAK: Final = 'schools_spring_break'
 SCHOOLS_SUMMER_BREAK: Final = 'schools_summer_break'
 SCHOOLS_AUTUMN_BREAK: Final = 'schools_autumn_break'
 
+BEFORE_AFTER_HOLIDAY: Final = 'before_after_holiday'
+BRIDGE_DAY: Final = 'bridge_day'
+
