@@ -2,33 +2,16 @@ import os
 import pandas as pd
 
 import constants
-from utils import read_demand_data, convert_hourly_to_daily
+import utils
 import stats
 
 
 def main(params):
     print(params['name'])
 
-    stats.examine_ramazan_impact()
-
-    start_date_before_covid = '2019-01-01'
-    end_date_before_covid = '2020-03-10'
-
-    start_date_after_covid = '2020-03-11'
-    end_date_after_covid = '2022-04-30'
-
-    df_before = read_demand_data(start_date=start_date_before_covid,
-                                 end_date=end_date_before_covid,
-                                 data_folder=constants.EPIAS_FOLDER)
-    df_after = read_demand_data(start_date=start_date_after_covid,
-                                end_date=end_date_after_covid,
-                                data_folder=constants.EPIAS_FOLDER)
-
-    df_before_daily = convert_hourly_to_daily(df_before)
-    df_after_daily = convert_hourly_to_daily(df_after)
-
-    hourly_averages_before = stats.compute_hourly_averages_for_each_day(df_before)
-    hourly_averages_after = stats.compute_hourly_averages_for_each_day(df_after)
+    # stats.examine_ramazan_impact()
+    # stats.examine_covid_impact()
+    stats.examine_daily_averages_for_each_year()
 
     dummy = -32
 

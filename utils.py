@@ -81,7 +81,6 @@ def implement_special_days(df):
             if (d >= min_datetime.date()) and (d <= max_datetime.date()):
                 out_df.loc[out_df.index.date == d, constants.RAMAZAN] = True
 
-
     ##########################################
     # Official Holidays (National + Religious)
     ##########################################
@@ -130,9 +129,7 @@ def is_inside(in_date, min_date, max_date):
     return out
 
 
-
 def get_holidays(year):
-
     the_list = [get_constant_holidays(year=year),
                 get_special_days_as_a_list(year=year, special_day=constants.RAMAZAN_BAYRAM),
                 get_special_days_as_a_list(year=year, special_day=constants.KURBAN_BAYRAM)]
@@ -170,7 +167,6 @@ def convert_hourly_to_daily(df):
     out[constants.HOLIDAY] = df.groupby(df.index.date)[constants.HOLIDAY].sum()
     out[constants.HOLIDAY] = out[constants.HOLIDAY] > 0
 
-
     out[constants.SCHOOLS_CLOSED] = df.groupby(df.index.date)[constants.SCHOOLS_CLOSED].sum()
     out[constants.SCHOOLS_CLOSED] = out[constants.SCHOOLS_CLOSED] > 0
 
@@ -184,3 +180,23 @@ def convert_hourly_to_daily(df):
     out[constants.BRIDGE_DAY] = out[constants.BRIDGE_DAY] > 0
 
     return out
+
+
+def read_daily_demand_data_for_all_years():
+    years = [2017, 2018, 2019, 2020, 2021, 2022]
+    df_dict = dict()
+
+    for year in years:
+        start_date = f'{year}-03-01'
+
+        if year == 2022:
+            end_date = f'{year}-05-31'
+        else:
+            end_date = f'{year}-06-30'
+
+        df = read_demand_data(start_date=start_date,
+                              end_date=end_date,
+                              data_folder=constants.EPIAS_FOLDER)
+        df_dict[str(year)] = convert_hourly_to_daily(df=df)
+
+    return df_dict
