@@ -45,12 +45,14 @@ def examine_covid_impact():
         plt.plot(hourly_averages_before[day], label=day)
         plt.legend()
         plt.grid()
+        plt.xlabel('Hour')
         plt.title('Before Covid')
 
         ax2 = plt.subplot(1, 2, 2, sharey=ax1)
         plt.plot(hourly_averages_after[day], label=day)
         plt.legend()
         plt.grid()
+        plt.xlabel('Hour')
         plt.title('After Covid')
 
     plt.show()
@@ -59,9 +61,32 @@ def examine_covid_impact():
 
 
 def examine_daily_averages_for_each_year():
-    df_dict = utils.read_daily_demand_data_for_all_years()
-    dummy = -32
+    df_dict = utils.read_demand_data_for_all_years()
+    hourly_averages_dict = dict()
 
+    years = [*df_dict.keys()]
+
+    for year in years:
+        hourly_averages_dict[year] = compute_hourly_averages_for_each_day(df_dict[year])
+
+    days = [*hourly_averages_dict[years[0]].columns]
+
+    fig, axes = plt.subplots(3, 3, figsize=(18, 18))
+
+    for idx, day in enumerate(days):
+
+        for year in years:
+            idx_y = idx // 3
+            idx_x = idx % 3
+            axes[idx_y, idx_x].plot(hourly_averages_dict[year][day], label=year)
+            axes[idx_y, idx_x].legend()
+            axes[idx_y, idx_x].grid()
+            axes[idx_y, idx_x].set_title(day)
+
+    plt.xlabel('Hour')
+    plt.show()
+
+    dummy = -32
 
 
 def examine_ramazan_impact():
@@ -101,8 +126,8 @@ def examine_ramazan_impact():
                  marker='*')
     plt.legend()
     plt.grid()
+    plt.title('Ramazan Impact')
+    plt.xlabel('Index of day in year')
     plt.show()
 
     dummy = -32
-
-

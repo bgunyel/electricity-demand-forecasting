@@ -9,8 +9,8 @@ import stats
 def main(params):
     print(params['name'])
 
-    # stats.examine_ramazan_impact()
-    # stats.examine_covid_impact()
+    stats.examine_ramazan_impact()
+    stats.examine_covid_impact()
     stats.examine_daily_averages_for_each_year()
 
     dummy = -32

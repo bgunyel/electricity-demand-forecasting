@@ -182,7 +182,7 @@ def convert_hourly_to_daily(df):
     return out
 
 
-def read_daily_demand_data_for_all_years():
+def read_demand_data_for_all_years():
     years = [2017, 2018, 2019, 2020, 2021, 2022]
     df_dict = dict()
 
@@ -194,9 +194,19 @@ def read_daily_demand_data_for_all_years():
         else:
             end_date = f'{year}-06-30'
 
-        df = read_demand_data(start_date=start_date,
-                              end_date=end_date,
-                              data_folder=constants.EPIAS_FOLDER)
-        df_dict[str(year)] = convert_hourly_to_daily(df=df)
+        df_dict[str(year)] = read_demand_data(start_date=start_date,
+                                              end_date=end_date,
+                                              data_folder=constants.EPIAS_FOLDER)
 
     return df_dict
+
+
+def read_daily_demand_data_for_all_years():
+
+    df_dict = read_daily_demand_data_for_all_years()
+    hourly_dict = dict()
+
+    for year in df_dict.keys():
+        hourly_dict[year] = convert_hourly_to_daily(df=df_dict[year])
+
+    return hourly_dict
