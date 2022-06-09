@@ -40,34 +40,31 @@ def examine_covid_impact():
                                       end_date=end_date_after_covid,
                                       data_folder=constants.EPIAS_FOLDER)
 
-    df_before_daily = utils.convert_hourly_to_daily(df_before)
-    df_after_daily = utils.convert_hourly_to_daily(df_after)
-
     hourly_averages_before = compute_hourly_averages_for_each_day(df_before)
     hourly_averages_during = compute_hourly_averages_for_each_day(df_during)
     hourly_averages_after = compute_hourly_averages_for_each_day(df_after)
 
+    fig, axes = plt.subplots(1, 3, figsize=(18, 8), sharey='all')
+
     for day in hourly_averages_before.columns:
-        ax1 = plt.subplot(1, 3, 1)
-        plt.plot(hourly_averages_before[day], label=day)
-        plt.legend()
-        plt.grid()
-        plt.xlabel('Hour')
-        plt.title('Before Covid')
 
-        ax2 = plt.subplot(1, 3, 2, sharey=ax1)
-        plt.plot(hourly_averages_during[day], label=day)
-        plt.legend()
-        plt.grid()
-        plt.xlabel('Hour')
-        plt.title('During Covid')
+        axes[0].plot(hourly_averages_before[day], label=day)
+        axes[0].legend()
+        axes[0].grid()
+        axes[0].set_xlabel('Hour')
+        axes[0].set_title('Before Covid')
 
-        ax3 = plt.subplot(1, 3, 3, sharey=ax1)
-        plt.plot(hourly_averages_after[day], label=day)
-        plt.legend()
-        plt.grid()
-        plt.xlabel('Hour')
-        plt.title('After Covid')
+        axes[1].plot(hourly_averages_during[day], label=day)
+        axes[1].legend()
+        axes[1].grid()
+        axes[1].set_xlabel('Hour')
+        axes[1].set_title('During Covid')
+
+        axes[2].plot(hourly_averages_after[day], label=day)
+        axes[2].legend()
+        axes[2].grid()
+        axes[2].set_xlabel('Hour')
+        axes[2].set_title('After Covid')
 
     plt.show()
 
@@ -85,7 +82,7 @@ def examine_daily_averages_for_each_year():
 
     days = [*hourly_averages_dict[years[0]].columns]
 
-    fig, axes = plt.subplots(3, 3, figsize=(18, 18))
+    fig, axes = plt.subplots(3, 3, figsize=(18, 18), sharey='all')
 
     for idx, day in enumerate(days):
 
@@ -95,9 +92,10 @@ def examine_daily_averages_for_each_year():
             axes[idx_y, idx_x].plot(hourly_averages_dict[year][day], label=year)
             axes[idx_y, idx_x].legend()
             axes[idx_y, idx_x].grid()
+            axes[idx_y, idx_x].set_xlabel('Hour')
             axes[idx_y, idx_x].set_title(day)
 
-    plt.xlabel('Hour')
+
     plt.show()
 
     dummy = -32
@@ -130,7 +128,7 @@ def examine_ramazan_impact():
 
     dummy = -32
 
-    plt.figure()
+    plt.figure(figsize=(18, 8))
 
     for year in years:
         df = df_dict[str(year)]
