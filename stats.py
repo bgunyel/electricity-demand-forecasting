@@ -21,14 +21,20 @@ def compute_hourly_averages_for_each_day(df):
 
 
 def examine_covid_impact():
-    start_date_before_covid = '2019-01-01'
-    end_date_before_covid = '2020-03-10'
+    start_date_before_covid = '2017-01-01'
+    end_date_before_covid = '2019-12-31'
 
-    start_date_after_covid = '2020-03-11'
+    start_date_during_covid = '2020-01-01'
+    end_date_during_covid = '2020-12-31'
+
+    start_date_after_covid = '2021-01-01'
     end_date_after_covid = '2022-05-31'
 
     df_before = utils.read_demand_data(start_date=start_date_before_covid,
                                        end_date=end_date_before_covid,
+                                       data_folder=constants.EPIAS_FOLDER)
+    df_during = utils.read_demand_data(start_date=start_date_during_covid,
+                                       end_date=end_date_during_covid,
                                        data_folder=constants.EPIAS_FOLDER)
     df_after = utils.read_demand_data(start_date=start_date_after_covid,
                                       end_date=end_date_after_covid,
@@ -38,17 +44,25 @@ def examine_covid_impact():
     df_after_daily = utils.convert_hourly_to_daily(df_after)
 
     hourly_averages_before = compute_hourly_averages_for_each_day(df_before)
+    hourly_averages_during = compute_hourly_averages_for_each_day(df_during)
     hourly_averages_after = compute_hourly_averages_for_each_day(df_after)
 
     for day in hourly_averages_before.columns:
-        ax1 = plt.subplot(1, 2, 1)
+        ax1 = plt.subplot(1, 3, 1)
         plt.plot(hourly_averages_before[day], label=day)
         plt.legend()
         plt.grid()
         plt.xlabel('Hour')
         plt.title('Before Covid')
 
-        ax2 = plt.subplot(1, 2, 2, sharey=ax1)
+        ax2 = plt.subplot(1, 3, 2, sharey=ax1)
+        plt.plot(hourly_averages_during[day], label=day)
+        plt.legend()
+        plt.grid()
+        plt.xlabel('Hour')
+        plt.title('During Covid')
+
+        ax3 = plt.subplot(1, 3, 3, sharey=ax1)
         plt.plot(hourly_averages_after[day], label=day)
         plt.legend()
         plt.grid()

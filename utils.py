@@ -17,7 +17,15 @@ def read_demand_data(start_date, end_date, data_folder):
     date2 = datetime.date.fromisoformat(end_date)
 
     d1 = datetime.date(year=date1.year, month=date1.month, day=1)
-    d2 = datetime.date(year=date2.year, month=date2.month + 1, day=1) - datetime.timedelta(days=1)
+
+    if date2.month == 12:
+        y = date2.year + 1
+        m = 1
+    else:
+        y = date2.year
+        m = date2.month + 1
+
+    d2 = datetime.date(year=y, month=m, day=1) - datetime.timedelta(days=1)
     dates = [dt for dt in rrule(MONTHLY, dtstart=d1, until=d2)]
     file_names_list = [os.path.join(data_folder,
                                     f'{file_name_root}_{d.year}-{d.month:02d}.{file_extension}') for d in dates]
