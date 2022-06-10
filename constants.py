@@ -9,6 +9,7 @@ SLIDING_HOLIDAYS_JSON = DATA_FOLDER + 'sliding_holidays.json'
 CONSUMPTION: Final = 'Consumption (MWh)'
 HOLIDAY: Final = 'holiday'
 WEEK_DAY: Final = 'week_day'
+WEEKEND: Final = 'weekend'
 
 MONDAY: Final = 'Monday'
 TUESDAY: Final = 'Tuesday'

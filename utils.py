@@ -65,6 +65,12 @@ def implement_special_days(df):
     out_df = df.copy(deep=True)
 
     #################
+    # Weekend
+    ################
+    out_df[constants.WEEKEND] = False
+    out_df.loc[out_df[constants.WEEK_DAY].isin([6, 7]), constants.WEEKEND] = True
+
+    #################
     # Ramazan
     #
     # Schools Closed
