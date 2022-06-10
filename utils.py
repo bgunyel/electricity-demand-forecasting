@@ -64,11 +64,15 @@ def implement_special_days(df):
 
     out_df = df.copy(deep=True)
 
-    #################
-    # Weekend
-    ################
+    #################################
+    # Weekend - Month - Day - Quarter
+    #################################
     out_df[constants.WEEKEND] = False
     out_df.loc[out_df[constants.WEEK_DAY].isin([6, 7]), constants.WEEKEND] = True
+
+    out_df[constants.MONTH] = out_df.index.month
+    out_df[constants.DAY] = out_df.index.day
+    out_df[constants.QUARTER] = (out_df[constants.MONTH] - 1) // 3 + 1
 
     #################
     # Ramazan
@@ -175,22 +179,31 @@ def get_special_days_as_a_list(year, special_day):
 
 def convert_hourly_to_daily(df):
     out = pd.DataFrame()
-    out[constants.CONSUMPTION] = df.groupby(df.index.date)[constants.CONSUMPTION].sum()
-    out[constants.WEEK_DAY] = df.groupby(df.index.date)[constants.WEEK_DAY].mean().astype('int')
+    df_grouped = df.groupby(df.index.date)
 
-    out[constants.HOLIDAY] = df.groupby(df.index.date)[constants.HOLIDAY].sum()
-    out[constants.HOLIDAY] = out[constants.HOLIDAY] > 0
+    out[constants.CONSUMPTION] = df_grouped[constants.CONSUMPTION].sum()
+    out[constants.WEEK_DAY] = df_grouped[constants.WEEK_DAY].mean().astype('int')
 
-    out[constants.SCHOOLS_CLOSED] = df.groupby(df.index.date)[constants.SCHOOLS_CLOSED].sum()
+    out[constants.WEEKEND] = df_grouped[constants.WEEKEND].sum()
+    out[constants.WEEKEND] = out[constants.WEEKEND] > 0
+
+    out[constants.MONTH] = df_grouped[constants.MONTH].mean().astype('int')
+    out[constants.DAY] = df_grouped[constants.DAY].mean().astype('int')
+    out[constants.QUARTER] = df_grouped[constants.QUARTER].mean().astype('int')
+
+    out[constants.SCHOOLS_CLOSED] = df_grouped[constants.SCHOOLS_CLOSED].sum()
     out[constants.SCHOOLS_CLOSED] = out[constants.SCHOOLS_CLOSED] > 0
 
-    out[constants.RAMAZAN] = df.groupby(df.index.date)[constants.RAMAZAN].sum()
+    out[constants.RAMAZAN] = df_grouped[constants.RAMAZAN].sum()
     out[constants.RAMAZAN] = out[constants.RAMAZAN] > 0
 
-    out[constants.BEFORE_AFTER_HOLIDAY] = df.groupby(df.index.date)[constants.BEFORE_AFTER_HOLIDAY].sum()
+    out[constants.HOLIDAY] = df_grouped[constants.HOLIDAY].sum()
+    out[constants.HOLIDAY] = out[constants.HOLIDAY] > 0
+
+    out[constants.BEFORE_AFTER_HOLIDAY] = df_grouped[constants.BEFORE_AFTER_HOLIDAY].sum()
     out[constants.BEFORE_AFTER_HOLIDAY] = out[constants.BEFORE_AFTER_HOLIDAY] > 0
 
-    out[constants.BRIDGE_DAY] = df.groupby(df.index.date)[constants.BRIDGE_DAY].sum()
+    out[constants.BRIDGE_DAY] = df_grouped[constants.BRIDGE_DAY].sum()
     out[constants.BRIDGE_DAY] = out[constants.BRIDGE_DAY] > 0
 
     return out
