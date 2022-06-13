@@ -47,7 +47,6 @@ def examine_covid_impact():
     fig, axes = plt.subplots(1, 3, figsize=(18, 8), sharey='all')
 
     for day in hourly_averages_before.columns:
-
         axes[0].plot(hourly_averages_before[day], label=day)
         axes[0].legend()
         axes[0].grid()
@@ -95,7 +94,6 @@ def examine_daily_averages_for_each_year():
             axes[idx_y, idx_x].set_xlabel('Hour')
             axes[idx_y, idx_x].set_title(day)
 
-
     plt.show()
 
     dummy = -32
@@ -140,6 +138,35 @@ def examine_ramazan_impact():
     plt.grid()
     plt.title('Ramazan Impact')
     plt.xlabel('Index of day in year')
+    plt.show()
+
+    dummy = -32
+
+
+def examine_schools_impact():
+    df_daily_dict = utils.read_daily_demand_data_for_all_years()
+    years = [*df_daily_dict.keys()]
+
+    fig, axes = plt.subplots(2, 3, figsize=(18, 8), sharey='all')
+
+    for idx, year in enumerate(years):
+        df_daily_dict[year]['day_of_year'] = df_daily_dict[year].index
+        df_daily_dict[year]['day_of_year'] = df_daily_dict[year]['day_of_year'].apply(lambda x: x.timetuple().tm_yday)
+        df_daily_dict[year]['weekly_average_consumption'] = df_daily_dict[year][constants.CONSUMPTION].rolling(7).mean()
+
+        idx_y = idx // 3
+        idx_x = idx % 3
+
+        df = df_daily_dict[year]
+        axes[idx_y, idx_x].plot(df['day_of_year'], df['weekly_average_consumption'], label=year)
+        axes[idx_y, idx_x].scatter(df.loc[df[constants.SCHOOLS_CLOSED], 'day_of_year'],
+                                   df.loc[df[constants.SCHOOLS_CLOSED], 'weekly_average_consumption'],
+                                   marker='*', label='Schools Closed', c='r')
+        axes[idx_y, idx_x].legend()
+        axes[idx_y, idx_x].grid(visible=True)
+        axes[idx_y, idx_x].set_xlabel('Index of day in year')
+        # axes[axis_id].set_title(title)
+
     plt.show()
 
     dummy = -32

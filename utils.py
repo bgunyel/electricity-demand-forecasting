@@ -214,12 +214,12 @@ def read_demand_data_for_all_years():
     df_dict = dict()
 
     for year in years:
-        start_date = f'{year}-03-01'
+        start_date = f'{year}-01-01'
 
         if year == 2022:
             end_date = f'{year}-05-31'
         else:
-            end_date = f'{year}-06-30'
+            end_date = f'{year}-12-31'
 
         df_dict[str(year)] = read_demand_data(start_date=start_date,
                                               end_date=end_date,
@@ -230,7 +230,7 @@ def read_demand_data_for_all_years():
 
 def read_daily_demand_data_for_all_years():
 
-    df_dict = read_daily_demand_data_for_all_years()
+    df_dict = read_demand_data_for_all_years()
     hourly_dict = dict()
 
     for year in df_dict.keys():

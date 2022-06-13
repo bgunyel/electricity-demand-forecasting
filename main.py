@@ -7,6 +7,7 @@ import stats
 
 
 def experimentation():
+    stats.examine_schools_impact()
     stats.examine_ramazan_impact()
     stats.examine_covid_impact()
     stats.examine_daily_averages_for_each_year()
@@ -26,8 +27,8 @@ def development():
 def main(params):
     print(params['name'])
 
-    # experimentation()
-    development()
+    experimentation()
+    # development()
 
     dummy = -32
 
