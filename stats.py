@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from statsmodels.tsa.stattools import acf, pacf
 
 import constants
 import utils
@@ -168,5 +169,38 @@ def examine_schools_impact():
         # axes[axis_id].set_title(title)
 
     plt.show()
+
+    dummy = -32
+
+
+def examine_acf():
+
+    start_date = '2017-01-01'
+    end_date = '2022-05-31'
+
+    df_hourly = utils.read_demand_data(start_date=start_date, end_date=end_date, data_folder=constants.EPIAS_FOLDER)
+    df_daily = utils.convert_hourly_to_daily(df=df_hourly)
+
+    fig, axes = plt.subplots(2, 1, figsize=(18, 8))
+
+    n_lags = 30
+    acf_daily = acf(df_daily[constants.CONSUMPTION], nlags=n_lags)
+    lags = [*range(0, n_lags+1)]
+
+
+    axes[0].stem(lags, acf_daily)
+    axes[0].grid(visible=True)
+    axes[0].set_title('Daily ACF')
+
+    n_lags = 50
+    acf_hourly = acf(df_hourly[constants.CONSUMPTION], nlags=n_lags)
+    lags = [*range(0, n_lags + 1)]
+
+    axes[1].stem(lags, acf_hourly)
+    axes[1].grid(visible=True)
+    axes[1].set_title('Hourly ACF')
+
+    plt.show()
+
 
     dummy = -32

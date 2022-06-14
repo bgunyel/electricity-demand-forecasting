@@ -8,6 +8,7 @@ import model
 
 
 def experimentation():
+    stats.examine_acf()
     stats.examine_schools_impact()
     stats.examine_ramazan_impact()
     stats.examine_covid_impact()
@@ -29,7 +30,7 @@ def development():
 def main(params):
     print(params['name'])
 
-    # experimentation()
+    experimentation()
     # development()
 
     df_dict = utils.train_test_split(data_resolution=constants.DAILY)
