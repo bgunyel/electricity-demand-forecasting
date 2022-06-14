@@ -64,12 +64,13 @@ def implement_special_days(df):
 
     out_df = df.copy(deep=True)
 
-    #################################
-    # Weekend - Month - Day - Quarter
-    #################################
+    #########################################
+    # Weekend - Year - Month - Day - Quarter
+    #########################################
     out_df[constants.WEEKEND] = False
     out_df.loc[out_df[constants.WEEK_DAY].isin([6, 7]), constants.WEEKEND] = True
 
+    out_df[constants.YEAR] = out_df.index.year
     out_df[constants.MONTH] = out_df.index.month
     out_df[constants.DAY] = out_df.index.day
     out_df[constants.QUARTER] = (out_df[constants.MONTH] - 1) // 3 + 1
@@ -187,6 +188,7 @@ def convert_hourly_to_daily(df):
     out[constants.WEEKEND] = df_grouped[constants.WEEKEND].sum()
     out[constants.WEEKEND] = out[constants.WEEKEND] > 0
 
+    out[constants.YEAR] = df_grouped[constants.YEAR].mean().astype('int')
     out[constants.MONTH] = df_grouped[constants.MONTH].mean().astype('int')
     out[constants.DAY] = df_grouped[constants.DAY].mean().astype('int')
     out[constants.QUARTER] = df_grouped[constants.QUARTER].mean().astype('int')

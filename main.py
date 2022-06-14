@@ -4,7 +4,7 @@ import pandas as pd
 import constants
 import utils
 import stats
-import training
+import model
 
 
 def experimentation():
@@ -31,7 +31,11 @@ def main(params):
 
     # experimentation()
     # development()
-    training.perform_training()
+
+    df_dict = utils.train_test_split(data_resolution=constants.DAILY)
+    model_handler = model.ModelHandler()
+    model_handler.train(df_train=df_dict[constants.TRAIN])
+
 
     dummy = -32
 
