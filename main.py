@@ -4,6 +4,7 @@ import pandas as pd
 import constants
 import utils
 import stats
+import training
 
 
 def experimentation():
@@ -24,11 +25,13 @@ def development():
     df_daily = utils.convert_hourly_to_daily(df=df)
 
 
+
 def main(params):
     print(params['name'])
 
-    experimentation()
+    # experimentation()
     # development()
+    training.perform_training()
 
     dummy = -32
 

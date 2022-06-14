@@ -35,3 +35,9 @@ SCHOOLS_AUTUMN_BREAK: Final = 'schools_autumn_break'
 BEFORE_AFTER_HOLIDAY: Final = 'before_after_holiday'
 BRIDGE_DAY: Final = 'bridge_day'
 
+DAILY: Final = 'daily'
+HOURLY: Final = 'hourly'
+
+TRAIN: Final = 'train'
+TEST: Final = 'test'
+

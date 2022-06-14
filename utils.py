@@ -231,9 +231,38 @@ def read_demand_data_for_all_years():
 def read_daily_demand_data_for_all_years():
 
     df_dict = read_demand_data_for_all_years()
-    hourly_dict = dict()
+    daily_dict = dict()
 
     for year in df_dict.keys():
-        hourly_dict[year] = convert_hourly_to_daily(df=df_dict[year])
+        daily_dict[year] = convert_hourly_to_daily(df=df_dict[year])
 
-    return hourly_dict
+    return daily_dict
+
+
+def train_test_split(data_resolution):
+
+    train_start_date = '2017-01-01'
+    train_end_date = '2021-12-31'
+
+    test_start_date = '2022-01-01'
+    test_end_date = '2022-05-31'
+
+    train_hourly = read_demand_data(start_date=train_start_date,
+                                    end_date=train_end_date,
+                                    data_folder=constants.EPIAS_FOLDER)
+    test_hourly = read_demand_data(start_date=test_start_date,
+                                   end_date=test_end_date,
+                                   data_folder=constants.EPIAS_FOLDER)
+
+    out_dict = dict()
+
+    if data_resolution == constants.DAILY:
+        out_dict[constants.TRAIN] = convert_hourly_to_daily(df=train_hourly)
+        out_dict[constants.TEST] = convert_hourly_to_daily(df=test_hourly)
+    elif data_resolution == constants.HOURLY:
+        out_dict[constants.TRAIN] = train_hourly
+        out_dict[constants.TEST] = test_hourly
+    else:
+        raise Exception('Unsupported data resolution')
+
+    return out_dict
