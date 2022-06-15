@@ -51,3 +51,9 @@ DAY_SINE: Final = 'day_sine'
 DAY_COS: Final = 'day_cos'
 QUARTER_SINE: Final = 'quarter_sine'
 QUARTER_COS: Final = 'quarter_cos'
+
+MIN: Final = 'min'
+MAX: Final = 'max'
+
+MEAN: Final = 'mean'
+STD: Final = 'std'

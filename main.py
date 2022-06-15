@@ -30,7 +30,7 @@ def development():
 def main(params):
     print(params['name'])
 
-    experimentation()
+    # experimentation()
     # development()
 
     df_dict = utils.train_test_split(data_resolution=constants.DAILY)
