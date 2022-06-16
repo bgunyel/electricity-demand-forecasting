@@ -1,7 +1,9 @@
+from torch.utils.data import DataLoader
 import numpy as np
 
 import constants
 import utils
+from data_set import ElectricityDataset
 
 
 def sin_transform(values, K):
@@ -58,9 +60,14 @@ class ModelHandler:
 
         out_df = out_df.drop(columns=[constants.YEAR, constants.WEEK_DAY, constants.MONTH, constants.DAY, constants.QUARTER])
 
-        out_df
+        out_df[constants.WEEKEND] = out_df[constants.WEEKEND].astype('float64')
+        out_df[constants.SCHOOLS_CLOSED] = out_df[constants.SCHOOLS_CLOSED].astype('float64')
+        out_df[constants.RAMAZAN] = out_df[constants.RAMAZAN].astype('float64')
+        out_df[constants.HOLIDAY] = out_df[constants.HOLIDAY].astype('float64')
+        out_df[constants.BEFORE_AFTER_HOLIDAY] = out_df[constants.BEFORE_AFTER_HOLIDAY].astype('float64')
+        out_df[constants.BRIDGE_DAY] = out_df[constants.BRIDGE_DAY].astype('float64')
 
-        dummy = -32
+        return out_df
 
 
     def post_process(self, df):
@@ -68,7 +75,15 @@ class ModelHandler:
 
 
     def train(self, df_train):
-        self.pre_process(df=df_train, mode=constants.TRAIN)
+        df = self.pre_process(df=df_train, mode=constants.TRAIN)
+        train_ds = ElectricityDataset(df=df)
+
+        train_data_loader = DataLoader(train_ds, batch_size=128, shuffle=True)
+
+        for idx, batch in enumerate(train_data_loader):
+            x, y = 
+
+        dummy = -32
 
 
     def predict(self):
