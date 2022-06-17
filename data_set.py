@@ -19,9 +19,10 @@ class ElectricityDataset(Dataset):
     def __getitem__(self, idx):
         row = self.df.iloc[[idx]]
         y = torch.tensor(row[constants.CONSUMPTION].values[0], dtype=torch.float32)
-        x = [torch.tensor(row.drop([constants.CONSUMPTION]).values[0], dtype=torch.float32)]
+        x = torch.tensor(row.drop(columns=[constants.CONSUMPTION]).values[0], dtype=torch.float32)
+        out = {'x': x, 'y': y}
 
-        return x, y
+        return out
 
 
 

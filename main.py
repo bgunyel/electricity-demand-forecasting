@@ -33,9 +33,13 @@ def main(params):
     # experimentation()
     # development()
 
-    df_dict = utils.train_test_split(data_resolution=constants.DAILY)
+    train_params = {constants.TRAIN_BATCH_SIZE: 128,
+                    constants.VALIDATION_BATCH_SIZE: 128}
+
+    data_resolution = constants.HOURLY
+    df_dict = utils.train_test_val_split(data_resolution=data_resolution)
     model_handler = model.ModelHandler()
-    model_handler.train(df_train=df_dict[constants.TRAIN])
+    model_handler.train(df_train=df_dict[constants.TRAIN], data_resolution=data_resolution, param_dict=train_params)
 
 
     dummy = -32

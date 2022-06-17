@@ -1,4 +1,5 @@
 from torch.utils.data import DataLoader
+import torch
 import numpy as np
 
 import constants
@@ -20,9 +21,25 @@ class ModelHandler:
         self.scaling_params = {constants.YEAR: {constants.MIN: -1, constants.MAX: -1},
                                constants.CONSUMPTION: {constants.MEAN: -1, constants.STD: -1}}
 
+        self.data_split = {constants.TRAIN: {constants.START: '0000-00-00', constants.END: '0000-00-00'},
+                           constants.VALIDATION: {constants.START: '0000-00-00', constants.END: '0000-00-00'},
+                           constants.TEST: {constants.START: '0000-00-00', constants.END: '0000-00-00'}}
+
+        self.data_resolution = 'NaN'
+
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print(f'Device: {self.device}')
 
 
-    def pre_process(self, df, mode):
+    def load_model(self):
+        pass
+
+
+    def save_model(self):
+        pass
+
+
+    def pre_process(self, df, mode, data_resolution):
 
         out_df = df.copy(deep=True)
 
@@ -32,10 +49,17 @@ class ModelHandler:
 
             self.scaling_params[constants.CONSUMPTION][constants.MEAN] = df[constants.CONSUMPTION].mean()
             self.scaling_params[constants.CONSUMPTION][constants.STD] = df[constants.CONSUMPTION].std()
-        elif mode == constants.TEST:
-            pass
+
+            self.data_resolution = data_resolution
+
+        elif mode in [constants.VALIDATION, constants.TEST]:
+            if data_resolution != self.data_resolution:
+                raise Exception(f'Data Resolution in {mode} and training are inconsistent!')
         else:
-            raise Exception('Operation mode not supported!')
+            raise Exception('Operation mode NOT supported!')
+
+        self.data_split[mode][constants.START] = df.index.min().date().isoformat()
+        self.data_split[mode][constants.END] = df.index.max().date().isoformat()
 
         out_df[constants.YEAR_MOD] = \
             (out_df[constants.YEAR] - self.scaling_params[constants.YEAR][constants.MIN]) / \
@@ -74,14 +98,51 @@ class ModelHandler:
         pass
 
 
-    def train(self, df_train):
-        df = self.pre_process(df=df_train, mode=constants.TRAIN)
-        train_ds = ElectricityDataset(df=df)
+    def update(self, train_loader):
+        print('Update')
 
-        train_data_loader = DataLoader(train_ds, batch_size=128, shuffle=True)
+
+    def validate(self, validation_loader):
+        print('Validate')
+
+
+    def train(self, df_train, df_validation, data_resolution, param_dict):
+        df_tr = self.pre_process(df=df_train, mode=constants.TRAIN, data_resolution=data_resolution)
+        df_val = self.pre_process(df=df_validation, mode=constants.VALIDATION, data_resolution=data_resolution)
+
+        train_ds = ElectricityDataset(df=df_tr)
+        validation_ds = ElectricityDataset(df=df_val)
+
+        train_data_loader = DataLoader(train_ds,
+                                       batch_size=param_dict[constants.TRAIN_BATCH_SIZE],
+                                       shuffle=True)
+        validation_data_loader = DataLoader(validation_ds,
+                                            batch_size=param_dict[constants.VALIDATION_BATCH_SIZE],
+                                            shuffle=True)
+
+        encoder_optimizer = torch.optim.AdamW(encoder.parameters(), lr=1e-3, weight_decay=1e-2)
+        decoder_optimizer = torch.optim.AdamW(decoder_cell.parameters(), lr=1e-3, weight_decay=1e-2)
+
+        encoder_scheduler = optim.lr_scheduler.OneCycleLR(encoder_optimizer, max_lr=1e-3,
+                                                          steps_per_epoch=len(train_dataloader), epochs=6)
+        decoder_scheduler = optim.lr_scheduler.OneCycleLR(decoder_optimizer, max_lr=1e-3,
+                                                          steps_per_epoch=len(train_dataloader), epochs=6)
+
+        for epoch in range(numberOfEpochs):
+            self.update(train_loader=train_data_loader, optimizer=optimizer)
+            self.validate(validation_loader=validation_data_loader)
+
+            trainingLossVector[epoch] = trLoss
+            trainingAccuracyVector[epoch] = trAccuracy
+            validationLossVector[epoch] = vlLoss
+            validationAccuracyVector[epoch] = vlAccuracy
+
 
         for idx, batch in enumerate(train_data_loader):
-            x, y = 
+            x = batch['x']
+            y = batch['y']
+            print(f'{idx}: {x} -- {y}')
+            dummy = -43
 
         dummy = -32
 

@@ -41,6 +41,7 @@ HOURLY: Final = 'hourly'
 
 TRAIN: Final = 'train'
 TEST: Final = 'test'
+VALIDATION: Final = 'validation'
 
 YEAR_MOD: Final = 'year_mod'
 WEEK_DAY_SINE: Final = 'week_day_sine'
@@ -57,3 +58,9 @@ MAX: Final = 'max'
 
 MEAN: Final = 'mean'
 STD: Final = 'std'
+
+START: Final = 'start'
+END: Final = 'end'
+
+TRAIN_BATCH_SIZE: Final = 'train_batch_size'
+VALIDATION_BATCH_SIZE: Final = 'validation_batch_size'
