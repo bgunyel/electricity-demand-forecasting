@@ -100,22 +100,22 @@ class ModelHandler:
     def post_process(self, df):
         pass
 
-
-
-    def update(self, x_past, x_future, y_future, encoder_optimizer, decoder_optimizer):
-        print('Update')
+    def update(self, x_past, x_future, y_future, encoder_optimizer, decoder_optimizer, loss_function):
+        target_length = y_future.size(0)
         self.model.train()
-
-
 
         encoder_optimizer.zero_grad()
         decoder_optimizer.zero_grad()
 
         out = self.model(x_past=x_past, x_future=x_future, y_future=y_future)
 
-        dummy = -32
+        loss = loss_function(out, y_future)
+        loss.backward()
 
+        encoder_optimizer.step()
+        decoder_optimizer.step()
 
+        return loss.item() / target_length
 
 
     def validate(self, validation_loader):
@@ -143,58 +143,35 @@ class ModelHandler:
         encoder_optimizer = torch.optim.AdamW(self.model.get_encoder().parameters(), lr=1e-3, weight_decay=1e-2)
         decoder_optimizer = torch.optim.AdamW(self.model.get_decoder().parameters(), lr=1e-3, weight_decay=1e-2)
 
+        loss_function = torch.nn.MSELoss()
+
+        train_loss_matrix = np.zeros((n_epochs, number_of_training_samples - input_sequence_length))
+
         for epoch in range(n_epochs):
-            print(f'EPOCH: {epoch}')
+            print(f'EPOCH: {epoch} -- {datetime.datetime.now()}')
 
             for idx in range(input_sequence_length, number_of_training_samples):
-                df_past = df_tr.iloc[idx - input_sequence_length : idx]
-                df_future = df_tr.iloc[idx : idx + output_sequence_length]
+                df_past = df_tr.iloc[idx - input_sequence_length: idx]
+                df_future = df_tr.iloc[idx: idx + output_sequence_length]
 
-                print(df_future.index[0])
+
 
                 x_past = torch.tensor(df_past.values, dtype=torch.float32).to(self.device)
-                x_future = torch.tensor(df_future.drop(columns=[constants.CONSUMPTION]).values, dtype=torch.float32).to(self.device)
+                x_future = torch.tensor(df_future.drop(columns=[constants.CONSUMPTION]).values, dtype=torch.float32).to(
+                    self.device)
                 y_future = torch.tensor(df_future[constants.CONSUMPTION].values, dtype=torch.float32).to(self.device)
 
-                self.update(x_past=x_past, x_future=x_future, y_future=y_future,
-                            encoder_optimizer=encoder_optimizer, decoder_optimizer=decoder_optimizer)
+                loss = self.update(x_past=x_past, x_future=x_future, y_future=y_future,
+                                   encoder_optimizer=encoder_optimizer, decoder_optimizer=decoder_optimizer,
+                                   loss_function=loss_function)
 
-            dummy = -32
+                train_loss_matrix[epoch, idx - input_sequence_length] = loss
 
-        # TODO: Lines below this line may be unnecessary
+                if idx % 240 == 0:
+                    print(f'{df_future.index[0]} @ {datetime.datetime.now()}')
+                    print(f'Loss: {loss}')
 
-        train_ds = ElectricityDataset(df=df_tr)
-        validation_ds = ElectricityDataset(df=df_val)
-
-        train_data_loader = DataLoader(train_ds,
-                                       batch_size=param_dict[constants.TRAIN_BATCH_SIZE],
-                                       shuffle=True)
-        validation_data_loader = DataLoader(validation_ds,
-                                            batch_size=param_dict[constants.VALIDATION_BATCH_SIZE],
-                                            shuffle=True)
-
-        encoder_optimizer = torch.optim.AdamW(encoder.parameters(), lr=1e-3, weight_decay=1e-2)
-        decoder_optimizer = torch.optim.AdamW(decoder_cell.parameters(), lr=1e-3, weight_decay=1e-2)
-
-        encoder_scheduler = optim.lr_scheduler.OneCycleLR(encoder_optimizer, max_lr=1e-3,
-                                                          steps_per_epoch=len(train_dataloader), epochs=6)
-        decoder_scheduler = optim.lr_scheduler.OneCycleLR(decoder_optimizer, max_lr=1e-3,
-                                                          steps_per_epoch=len(train_dataloader), epochs=6)
-
-        for epoch in range(numberOfEpochs):
-            self.update(train_loader=train_data_loader, optimizer=optimizer)
-            self.validate(validation_loader=validation_data_loader)
-
-            trainingLossVector[epoch] = trLoss
-            trainingAccuracyVector[epoch] = trAccuracy
-            validationLossVector[epoch] = vlLoss
-            validationAccuracyVector[epoch] = vlAccuracy
-
-        for idx, batch in enumerate(train_data_loader):
-            x = batch['x']
-            y = batch['y']
-            print(f'{idx}: {x} -- {y}')
-            dummy = -43
+                dummy = -32
 
         dummy = -32
 

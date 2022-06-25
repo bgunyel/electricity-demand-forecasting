@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import datetime
 
 import constants
 import utils
@@ -37,13 +38,13 @@ def main(params):
                                        constants.OUTPUT_SEQUENCE_LENGTH: 24,
                                        constants.NUMBER_OF_ENCODER_LAYERS: 1,
                                        constants.HIDDEN_LAYER_SIZE: 256,
-                                       constants.TEACHER_FORCING_PROB: 0.25,
+                                       constants.TEACHER_FORCING_PROB: 0.50,
                                        constants.NUMBER_OF_EPOCHS: 1},
                     constants.DAILY: {constants.INPUT_SEQUENCE_LENGTH: 49,
                                       constants.OUTPUT_SEQUENCE_LENGTH: 7,
                                       constants.NUMBER_OF_ENCODER_LAYERS: 1,
                                       constants.HIDDEN_LAYER_SIZE: 256,
-                                      constants.TEACHER_FORCING_PROB: 0.25,
+                                      constants.TEACHER_FORCING_PROB: 0.50,
                                       constants.NUMBER_OF_EPOCHS: 1}}
 
     train_params = {constants.HOURLY: {constants.INPUT_SEQUENCE_LENGTH: 168,
@@ -67,11 +68,11 @@ if __name__ == '__main__':
     parameters = {'name': 'Electricity Demand Forecasting'}
 
     print('------------------')
-    print('STARTED EXECUTION')
+    print(f'STARTED EXECUTION @ {datetime.datetime.now()}')
     print('------------------')
 
     main(params=parameters)
 
     print('------------------')
-    print('FINISHED EXECUTION')
+    print(f'FINISHED EXECUTION @ {datetime.datetime.now()}')
     print('------------------')

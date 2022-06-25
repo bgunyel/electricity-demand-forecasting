@@ -76,7 +76,7 @@ class EncoderDecoderRNN(nn.Module):
                                   input_size=input_vector_length,
                                   hidden_size=hidden_vector_size,
                                   device=device).to(device)
-        self.decoder = DecoderRNN(input_size=input_vector_length-1,
+        self.decoder = DecoderRNN(input_size=input_vector_length,
                                   hidden_size=hidden_vector_size,
                                   output_size=1,
                                   device=device).to(device)
@@ -98,13 +98,29 @@ class EncoderDecoderRNN(nn.Module):
         self.decoder.set_hidden_state(encoder_hidden)
         decoder_input = None # TODO
 
+        y_prev = x_past[-1, 0].view(1, 1)
+
+
+        output = torch.zeros(self.output_sequence_length, device=self.device)
+
+        dummy = -32
+
 
 
         if (y_future is not None) and teacher_forcing:
             for i in range(self.output_sequence_length):
-                out = self.decoder(x=x_future[i].view(1, 1, -1))
+                decoder_input = torch.cat((y_prev, x_future[i].view(-1, 1)), axis=0).view(1, 1, -1)
+                output[i] = self.decoder(x=decoder_input)
+                y_prev = y_future[i].view(1, 1)
+                dummy = -1
         else:
-            pass
+            for i in range(self.output_sequence_length):
+                decoder_input = torch.cat((y_prev, x_future[i].view(-1, 1)), axis=0).view(1, 1, -1)
+                y_prev = self.decoder(x=decoder_input)
+                output[i] = y_prev
+                dummy = -3
+
+        return output
 
 
     def get_encoder(self):
