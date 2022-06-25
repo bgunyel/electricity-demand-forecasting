@@ -64,3 +64,11 @@ END: Final = 'end'
 
 TRAIN_BATCH_SIZE: Final = 'train_batch_size'
 VALIDATION_BATCH_SIZE: Final = 'validation_batch_size'
+NUMBER_OF_EPOCHS: Final = 'n_epochs'
+
+INPUT_SEQUENCE_LENGTH: Final = 'input_sequence_length'
+OUTPUT_SEQUENCE_LENGTH: Final = 'output_sequence_length'
+HIDDEN_LAYER_SIZE: Final = 'hidden_layer_size'
+NUMBER_OF_ENCODER_LAYERS: Final = 'number_of_encoder_layers'
+TEACHER_FORCING_PROB: Final = 'teacher_forcing_prob'
+

@@ -33,13 +33,31 @@ def main(params):
     # experimentation()
     # development()
 
-    train_params = {constants.TRAIN_BATCH_SIZE: 128,
-                    constants.VALIDATION_BATCH_SIZE: 128}
+    model_params = {constants.HOURLY: {constants.INPUT_SEQUENCE_LENGTH: 168,
+                                       constants.OUTPUT_SEQUENCE_LENGTH: 24,
+                                       constants.NUMBER_OF_ENCODER_LAYERS: 1,
+                                       constants.HIDDEN_LAYER_SIZE: 256,
+                                       constants.TEACHER_FORCING_PROB: 0.25,
+                                       constants.NUMBER_OF_EPOCHS: 1},
+                    constants.DAILY: {constants.INPUT_SEQUENCE_LENGTH: 49,
+                                      constants.OUTPUT_SEQUENCE_LENGTH: 7,
+                                      constants.NUMBER_OF_ENCODER_LAYERS: 1,
+                                      constants.HIDDEN_LAYER_SIZE: 256,
+                                      constants.TEACHER_FORCING_PROB: 0.25,
+                                      constants.NUMBER_OF_EPOCHS: 1}}
+
+    train_params = {constants.HOURLY: {constants.INPUT_SEQUENCE_LENGTH: 168,
+                                       constants.OUTPUT_SEQUENCE_LENGTH: 24},
+                    constants.DAILY: {constants.INPUT_SEQUENCE_LENGTH: 49,
+                                      constants.OUTPUT_SEQUENCE_LENGTH: 7}}
 
     data_resolution = constants.HOURLY
     df_dict = utils.train_test_val_split(data_resolution=data_resolution)
-    model_handler = model.ModelHandler()
-    model_handler.train(df_train=df_dict[constants.TRAIN], data_resolution=data_resolution, param_dict=train_params)
+    model_handler = model.ModelHandler(model_params=model_params[data_resolution])
+    model_handler.train(df_train=df_dict[constants.TRAIN],
+                        df_validation=df_dict[constants.VALIDATION],
+                        data_resolution=data_resolution,
+                        param_dict=train_params[data_resolution])
 
 
     dummy = -32

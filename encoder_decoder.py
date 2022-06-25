@@ -8,8 +8,8 @@ class EncoderRNN(nn.Module):
                  n_layers=1,
                  input_size=1,
                  hidden_size=100,
-                 device='cpu',
-                 dropout_prob=0.2):
+                 dropout_prob=0.2,
+                 device='cpu'):
         super(EncoderRNN, self).__init__()
         self.hidden_size = hidden_size
         self.input_size = input_size
@@ -21,7 +21,8 @@ class EncoderRNN(nn.Module):
             bidirectional=False,
             dropout=dropout_prob)
         self.device = device
-        self.hidden_state = torch.zeros(self.num_layers, 1, self.hidden_size, device=self.device)
+
+        self.hidden_state = torch.zeros(self.num_layers, 1, self.hidden_size, device=device)
 
     def forward(self, x):
         out, hidden = self.gru(x, self.hidden_state)
@@ -41,8 +42,8 @@ class DecoderRNN(nn.Module):
         super(DecoderRNN, self).__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
+        self.hidden_state = torch.zeros(1, 1, self.hidden_size)
         self.device = device
-        self.hidden_state = torch.zeros(1, 1, self.hidden_size, device=self.device)
 
         self.gru = nn.GRU(input_size=input_size, hidden_size=hidden_size)
         self.fc = nn.Linear(hidden_size, output_size)
@@ -51,7 +52,7 @@ class DecoderRNN(nn.Module):
         output, hidden = self.gru(x, self.hidden_state)
         self.hidden_state = hidden
         output = self.fc(output[0])
-        return output, hidden
+        return output
 
     def initialize_hidden(self):
         self.hidden_state = torch.zeros(1, 1, self.hidden_size, device=self.device)
@@ -74,11 +75,11 @@ class EncoderDecoderRNN(nn.Module):
         self.encoder = EncoderRNN(n_layers=n_encoder_layers,
                                   input_size=input_vector_length,
                                   hidden_size=hidden_vector_size,
-                                  device=device)
+                                  device=device).to(device)
         self.decoder = DecoderRNN(input_size=input_vector_length-1,
                                   hidden_size=hidden_vector_size,
                                   output_size=1,
-                                  device=device)
+                                  device=device).to(device)
         self.device = device
         self.input_sequence_length = input_sequence_length
         self.output_sequence_length = output_sequence_length
@@ -92,14 +93,24 @@ class EncoderDecoderRNN(nn.Module):
         teacher_forcing = True if random.random() < self.teacher_forcing_prob else False
 
         for i in range(self.input_sequence_length):
-            out = self.encoder(x=x_past[i])
+            out = self.encoder(x=x_past[i].view(1, 1, -1))
         encoder_hidden = self.encoder.get_hidden_state()
         self.decoder.set_hidden_state(encoder_hidden)
         decoder_input = None # TODO
 
+
+
         if (y_future is not None) and teacher_forcing:
-            pass
+            for i in range(self.output_sequence_length):
+                out = self.decoder(x=x_future[i].view(1, 1, -1))
         else:
             pass
+
+
+    def get_encoder(self):
+        return self.encoder
+
+    def get_decoder(self):
+        return self.decoder
 
 

@@ -1,3 +1,5 @@
+import datetime
+
 from torch.utils.data import DataLoader
 import torch
 import numpy as np
@@ -5,6 +7,7 @@ import numpy as np
 import constants
 import utils
 from data_set import ElectricityDataset
+from encoder_decoder import EncoderDecoderRNN
 
 
 def sin_transform(values, K):
@@ -16,7 +19,7 @@ def cos_transform(values, K):
 
 
 class ModelHandler:
-    def __init__(self):
+    def __init__(self, model_params):
 
         self.scaling_params = {constants.YEAR: {constants.MIN: -1, constants.MAX: -1},
                                constants.CONSUMPTION: {constants.MEAN: -1, constants.STD: -1}}
@@ -30,14 +33,15 @@ class ModelHandler:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(f'Device: {self.device}')
 
+        self.model_params = model_params
+
+        self.model = None
 
     def load_model(self):
         pass
 
-
     def save_model(self):
         pass
-
 
     def pre_process(self, df, mode, data_resolution):
 
@@ -81,8 +85,8 @@ class ModelHandler:
             (out_df[constants.CONSUMPTION] - self.scaling_params[constants.CONSUMPTION][constants.MEAN]) / \
             self.scaling_params[constants.CONSUMPTION][constants.STD]
 
-
-        out_df = out_df.drop(columns=[constants.YEAR, constants.WEEK_DAY, constants.MONTH, constants.DAY, constants.QUARTER])
+        out_df = out_df.drop(
+            columns=[constants.YEAR, constants.WEEK_DAY, constants.MONTH, constants.DAY, constants.QUARTER])
 
         out_df[constants.WEEKEND] = out_df[constants.WEEKEND].astype('float64')
         out_df[constants.SCHOOLS_CLOSED] = out_df[constants.SCHOOLS_CLOSED].astype('float64')
@@ -93,22 +97,71 @@ class ModelHandler:
 
         return out_df
 
-
     def post_process(self, df):
         pass
 
 
-    def update(self, train_loader):
+
+    def update(self, x_past, x_future, y_future, encoder_optimizer, decoder_optimizer):
         print('Update')
+        self.model.train()
+
+
+
+        encoder_optimizer.zero_grad()
+        decoder_optimizer.zero_grad()
+
+        out = self.model(x_past=x_past, x_future=x_future, y_future=y_future)
+
+        dummy = -32
+
+
 
 
     def validate(self, validation_loader):
         print('Validate')
-
+        self.model.eval()
 
     def train(self, df_train, df_validation, data_resolution, param_dict):
         df_tr = self.pre_process(df=df_train, mode=constants.TRAIN, data_resolution=data_resolution)
         df_val = self.pre_process(df=df_validation, mode=constants.VALIDATION, data_resolution=data_resolution)
+
+        self.model = EncoderDecoderRNN(input_sequence_length=self.model_params[constants.INPUT_SEQUENCE_LENGTH],
+                                       output_sequence_length=self.model_params[constants.OUTPUT_SEQUENCE_LENGTH],
+                                       input_vector_length=df_tr.shape[1],
+                                       hidden_vector_size=self.model_params[constants.HIDDEN_LAYER_SIZE],
+                                       n_encoder_layers=self.model_params[constants.NUMBER_OF_ENCODER_LAYERS],
+                                       teacher_forcing_prob=self.model_params[constants.TEACHER_FORCING_PROB],
+                                       device=self.device)
+
+        input_sequence_length = self.model_params[constants.INPUT_SEQUENCE_LENGTH]
+        output_sequence_length = self.model_params[constants.OUTPUT_SEQUENCE_LENGTH]
+
+        number_of_training_samples = df_tr.shape[0]
+        n_epochs = self.model_params[constants.NUMBER_OF_EPOCHS]
+
+        encoder_optimizer = torch.optim.AdamW(self.model.get_encoder().parameters(), lr=1e-3, weight_decay=1e-2)
+        decoder_optimizer = torch.optim.AdamW(self.model.get_decoder().parameters(), lr=1e-3, weight_decay=1e-2)
+
+        for epoch in range(n_epochs):
+            print(f'EPOCH: {epoch}')
+
+            for idx in range(input_sequence_length, number_of_training_samples):
+                df_past = df_tr.iloc[idx - input_sequence_length : idx]
+                df_future = df_tr.iloc[idx : idx + output_sequence_length]
+
+                print(df_future.index[0])
+
+                x_past = torch.tensor(df_past.values, dtype=torch.float32).to(self.device)
+                x_future = torch.tensor(df_future.drop(columns=[constants.CONSUMPTION]).values, dtype=torch.float32).to(self.device)
+                y_future = torch.tensor(df_future[constants.CONSUMPTION].values, dtype=torch.float32).to(self.device)
+
+                self.update(x_past=x_past, x_future=x_future, y_future=y_future,
+                            encoder_optimizer=encoder_optimizer, decoder_optimizer=decoder_optimizer)
+
+            dummy = -32
+
+        # TODO: Lines below this line may be unnecessary
 
         train_ds = ElectricityDataset(df=df_tr)
         validation_ds = ElectricityDataset(df=df_val)
@@ -137,7 +190,6 @@ class ModelHandler:
             validationLossVector[epoch] = vlLoss
             validationAccuracyVector[epoch] = vlAccuracy
 
-
         for idx, batch in enumerate(train_data_loader):
             x = batch['x']
             y = batch['y']
@@ -145,7 +197,6 @@ class ModelHandler:
             dummy = -43
 
         dummy = -32
-
 
     def predict(self):
         pass
