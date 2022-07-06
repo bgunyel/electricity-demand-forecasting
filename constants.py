@@ -55,6 +55,7 @@ QUARTER_COS: Final = 'quarter_cos'
 
 MIN: Final = 'min'
 MAX: Final = 'max'
+AVERAGE: Final = 'average'
 
 MEAN: Final = 'mean'
 STD: Final = 'std'

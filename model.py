@@ -1,4 +1,5 @@
 import datetime
+import pickle
 
 from torch.utils.data import DataLoader
 import torch
@@ -36,6 +37,8 @@ class ModelHandler:
         self.model_params = model_params
 
         self.model = None
+        self.train_loss_matrix = None
+        self.validation_loss_matrix = None
 
     def load_model(self):
         pass
@@ -44,6 +47,8 @@ class ModelHandler:
         pass
 
     def pre_process(self, df, mode, data_resolution):
+
+        print(f'Hour should be added as a feature in hourly data resolution!!!!!!!')
 
         out_df = df.copy(deep=True)
 
@@ -117,10 +122,28 @@ class ModelHandler:
 
         return loss.item() / target_length
 
-
-    def validate(self, validation_loader):
-        print('Validate')
+    def validate(self, df_val, loss_function, input_sequence_length, output_sequence_length):
         self.model.eval()
+
+        number_of_validation_samples = df_val.shape[0]
+        loss = 0
+
+        with torch.no_grad():
+            for idx in range(input_sequence_length, number_of_validation_samples - output_sequence_length):
+                df_past = df_val.iloc[idx - input_sequence_length: idx]
+                df_future = df_val.iloc[idx: idx + output_sequence_length]
+
+                x_past = torch.tensor(df_past.values, dtype=torch.float32).to(self.device)
+                x_future = torch.tensor(df_future.drop(columns=[constants.CONSUMPTION]).values, dtype=torch.float32).to(
+                    self.device)
+                y_future = torch.tensor(df_future[constants.CONSUMPTION].values, dtype=torch.float32).to(self.device)
+
+                out = self.model(x_past=x_past, x_future=x_future, y_future=y_future)
+                loss += loss_function(out, y_future)
+
+        loss = loss / number_of_validation_samples
+
+        return loss
 
     def train(self, df_train, df_validation, data_resolution, param_dict):
         df_tr = self.pre_process(df=df_train, mode=constants.TRAIN, data_resolution=data_resolution)
@@ -145,35 +168,78 @@ class ModelHandler:
 
         loss_function = torch.nn.MSELoss()
 
-        train_loss_matrix = np.zeros((n_epochs, number_of_training_samples - input_sequence_length))
+        validation_period = 240
+
+        self.train_loss_matrix = np.zeros((n_epochs, number_of_training_samples - input_sequence_length))
+        self.validation_loss_matrix = np.zeros((n_epochs, number_of_training_samples - input_sequence_length))
 
         for epoch in range(n_epochs):
             print(f'EPOCH: {epoch} -- {datetime.datetime.now()}')
 
-            for idx in range(input_sequence_length, number_of_training_samples):
+            for idx in range(input_sequence_length, number_of_training_samples - output_sequence_length):
                 df_past = df_tr.iloc[idx - input_sequence_length: idx]
                 df_future = df_tr.iloc[idx: idx + output_sequence_length]
-
-
 
                 x_past = torch.tensor(df_past.values, dtype=torch.float32).to(self.device)
                 x_future = torch.tensor(df_future.drop(columns=[constants.CONSUMPTION]).values, dtype=torch.float32).to(
                     self.device)
                 y_future = torch.tensor(df_future[constants.CONSUMPTION].values, dtype=torch.float32).to(self.device)
 
-                loss = self.update(x_past=x_past, x_future=x_future, y_future=y_future,
-                                   encoder_optimizer=encoder_optimizer, decoder_optimizer=decoder_optimizer,
-                                   loss_function=loss_function)
+                train_loss = self.update(x_past=x_past, x_future=x_future, y_future=y_future,
+                                         encoder_optimizer=encoder_optimizer, decoder_optimizer=decoder_optimizer,
+                                         loss_function=loss_function)
 
-                train_loss_matrix[epoch, idx - input_sequence_length] = loss
+                self.train_loss_matrix[epoch, idx - input_sequence_length] = train_loss
 
-                if idx % 240 == 0:
+                if (idx - input_sequence_length) % validation_period == 0:
+
+                    validation_loss = self.validate(df_val=df_val,
+                                                    loss_function=loss_function,
+                                                    input_sequence_length=input_sequence_length,
+                                                    output_sequence_length=output_sequence_length)
+                    self.validation_loss_matrix[epoch, idx - input_sequence_length] = validation_loss
+
                     print(f'{df_future.index[0]} @ {datetime.datetime.now()}')
-                    print(f'Loss: {loss}')
+                    print(f'Train Loss: {train_loss}')
+                    print(f'Validation Loss: {validation_loss}')
 
-                dummy = -32
+                    dummy = -32
+
+        self.save()
 
         dummy = -32
 
-    def predict(self):
+    def predict(self, df_test_data, input_sequence_length, output_sequence_length):
+
         pass
+
+        '''
+        df_test = self.pre_process(df=df_test_data, mode=constants.TEST, data_resolution=self.data_resolution)
+
+        self.model.eval()
+        number_of_test_samples = df_test.shape[0]
+
+        with torch.no_grad():
+            for idx in range(input_sequence_length, number_of_test_samples - output_sequence_length):
+                df_past = df_test.iloc[idx - input_sequence_length: idx]
+                df_future = df_test.iloc[idx: idx + output_sequence_length]
+
+                x_past = torch.tensor(df_past.values, dtype=torch.float32).to(self.device)
+                x_future = torch.tensor(df_future.drop(columns=[constants.CONSUMPTION]).values, dtype=torch.float32).to(
+                    self.device)
+                y_future = torch.tensor(df_future[constants.CONSUMPTION].values, dtype=torch.float32).to(self.device)
+
+                out = self.model(x_past=x_past, x_future=x_future, y_future=y_future)
+
+        out = out * self.scaling_params[constants.CONSUMPTION][constants.STD]
+        out = out + self.scaling_params[constants.CONSUMPTION][constants.MEAN]
+
+        return out
+        
+        '''
+
+
+    def save(self):
+        model_name = f'./out/model_handler_{datetime.datetime.now()}.pkl'
+        with open(model_name, 'wb') as file:
+            pickle.dump(self, file, pickle.HIGHEST_PROTOCOL)

@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import datetime
+import matplotlib.pyplot as plt
 
 import constants
 import utils
@@ -9,6 +10,8 @@ import model
 
 
 def experimentation():
+    stats.examine_daily_averages_for_each_year()
+    stats.examine_daily_averages_for_each_year()
     stats.examine_acf()
     stats.examine_schools_impact()
     stats.examine_ramazan_impact()
@@ -17,23 +20,10 @@ def experimentation():
 
 
 def development():
-    start_date = '2021-01-01'
-    end_date = '2022-05-31'
-
-    df = utils.read_demand_data(start_date=start_date,
-                                end_date=end_date,
-                                data_folder=constants.EPIAS_FOLDER)
-
-    df_daily = utils.convert_hourly_to_daily(df=df)
+    dummy = -32
 
 
-
-def main(params):
-    print(params['name'])
-
-    # experimentation()
-    # development()
-
+def train():
     model_params = {constants.HOURLY: {constants.INPUT_SEQUENCE_LENGTH: 168,
                                        constants.OUTPUT_SEQUENCE_LENGTH: 24,
                                        constants.NUMBER_OF_ENCODER_LAYERS: 1,
@@ -59,6 +49,16 @@ def main(params):
                         df_validation=df_dict[constants.VALIDATION],
                         data_resolution=data_resolution,
                         param_dict=train_params[data_resolution])
+
+
+def main(params):
+    print(params['name'])
+
+    # experimentation()
+    # development()
+    train()
+
+
 
 
     dummy = -32

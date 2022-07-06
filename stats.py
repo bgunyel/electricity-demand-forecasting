@@ -29,7 +29,7 @@ def examine_covid_impact():
     end_date_during_covid = '2020-12-31'
 
     start_date_after_covid = '2021-01-01'
-    end_date_after_covid = '2022-05-31'
+    end_date_after_covid = '2022-06-30'
 
     df_before = utils.read_demand_data(start_date=start_date_before_covid,
                                        end_date=end_date_before_covid,
@@ -41,28 +41,46 @@ def examine_covid_impact():
                                       end_date=end_date_after_covid,
                                       data_folder=constants.EPIAS_FOLDER)
 
+    df_all = utils.read_demand_data(start_date=start_date_before_covid,
+                                    end_date=end_date_after_covid,
+                                    data_folder=constants.EPIAS_FOLDER)
+
     hourly_averages_before = compute_hourly_averages_for_each_day(df_before)
     hourly_averages_during = compute_hourly_averages_for_each_day(df_during)
     hourly_averages_after = compute_hourly_averages_for_each_day(df_after)
 
+    hourly_averages_all = compute_hourly_averages_for_each_day(df_all)
+
+    plt.figure(figsize=(18, 8))
+
+    for day in hourly_averages_all.columns:
+        plt.plot(hourly_averages_all[day], label=day)
+        plt.legend()
+        plt.grid(visible=True)
+        plt.xlabel('Hour')
+        plt.title('Daily Average Consumptions')
+
+    plt.show()
+
     fig, axes = plt.subplots(1, 3, figsize=(18, 8), sharey='all')
 
     for day in hourly_averages_before.columns:
+
         axes[0].plot(hourly_averages_before[day], label=day)
         axes[0].legend()
-        axes[0].grid()
+        axes[0].grid(visible=True)
         axes[0].set_xlabel('Hour')
         axes[0].set_title('Before Covid')
 
         axes[1].plot(hourly_averages_during[day], label=day)
         axes[1].legend()
-        axes[1].grid()
+        axes[1].grid(visible=True)
         axes[1].set_xlabel('Hour')
         axes[1].set_title('During Covid')
 
         axes[2].plot(hourly_averages_after[day], label=day)
         axes[2].legend()
-        axes[2].grid()
+        axes[2].grid(visible=True)
         axes[2].set_xlabel('Hour')
         axes[2].set_title('After Covid')
 
@@ -97,6 +115,56 @@ def examine_daily_averages_for_each_year():
 
     plt.show()
 
+    df_dict = utils.compute_daily_average_demand_for_all_years()
+
+    plt.figure(figsize=(18, 8))
+
+    for year in df_dict.keys():
+        plt.plot(df_dict[year][constants.AVERAGE], label=year)
+
+    plt.grid(visible=True)
+    plt.legend()
+    plt.title('Daily Average Consumption (MWh)')
+    plt.show()
+
+    dummy = -32
+
+
+def examine_weekly_averages_for_each_year():
+
+    years = [2017, 2018, 2019, 2020, 2021, 2022]
+    df_dict = dict()
+
+    for year in years:
+        start_date = f'{year}-03-01'
+
+        if year == 2022:
+            end_date = f'{year}-06-30'
+        else:
+            end_date = f'{year}-12-31'
+
+        df = utils.read_demand_data(start_date=start_date,
+                                    end_date=end_date,
+                                    data_folder=constants.EPIAS_FOLDER)
+        df_dict[str(year)] = utils.convert_hourly_to_daily(df=df)
+        df_dict[str(year)]['day_of_year'] = df_dict[str(year)].index
+        df_dict[str(year)]['day_of_year'] = df_dict[str(year)]['day_of_year'].apply(lambda x: x.timetuple().tm_yday)
+        df_dict[str(year)]['weekly_average_consumption'] = df_dict[str(year)][constants.CONSUMPTION].rolling(7).mean()
+        # df_dict[str(year)].month_day = df_dict[str(year)].month_day.apply(lambda x: f'{x.month:02d}-{x.day:02d}')
+
+
+    plt.figure(figsize=(18, 8))
+
+    for year in years:
+        df = df_dict[str(year)]
+        plt.plot(df['day_of_year'], df['weekly_average_consumption'], label=str(year))
+
+    plt.legend()
+    plt.grid()
+    plt.title('Weekly Average Consumptions')
+    plt.xlabel('Index of day in year')
+    plt.show()
+
     dummy = -32
 
 
@@ -108,11 +176,7 @@ def examine_ramazan_impact():
 
     for year in years:
         start_date = f'{year}-03-01'
-
-        if year == 2022:
-            end_date = f'{year}-05-31'
-        else:
-            end_date = f'{year}-06-30'
+        end_date = f'{year}-06-30'
 
         df = utils.read_demand_data(start_date=start_date,
                                     end_date=end_date,
@@ -174,7 +238,6 @@ def examine_schools_impact():
 
 
 def examine_acf():
-
     start_date = '2017-01-01'
     end_date = '2022-05-31'
 
@@ -185,8 +248,7 @@ def examine_acf():
 
     n_lags = 30
     acf_daily = acf(df_daily[constants.CONSUMPTION], nlags=n_lags)
-    lags = [*range(0, n_lags+1)]
-
+    lags = [*range(0, n_lags + 1)]
 
     axes[0].stem(lags, acf_daily)
     axes[0].grid(visible=True)
@@ -202,5 +264,7 @@ def examine_acf():
 
     plt.show()
 
-
     dummy = -32
+
+
+

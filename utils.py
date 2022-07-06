@@ -219,7 +219,7 @@ def read_demand_data_for_all_years():
         start_date = f'{year}-01-01'
 
         if year == 2022:
-            end_date = f'{year}-05-31'
+            end_date = f'{year}-06-30'
         else:
             end_date = f'{year}-12-31'
 
@@ -240,6 +240,22 @@ def read_daily_demand_data_for_all_years():
     return daily_dict
 
 
+def compute_daily_average_demand_for_all_years():
+
+    df_dict = read_demand_data_for_all_years()
+
+    out_dict = dict()
+
+    for year in df_dict.keys():
+        df_dict[year]['hour'] = df_dict[year].index.hour
+
+        out_dict[year] = pd.DataFrame()
+        out_dict[year][constants.AVERAGE] = df_dict[year].groupby(by='hour')[constants.CONSUMPTION].mean()
+
+    return out_dict
+
+
+
 def train_test_val_split(data_resolution):
     train_start_date = '2017-01-01'
     train_end_date = '2021-12-31'
@@ -248,7 +264,7 @@ def train_test_val_split(data_resolution):
     validation_end_date = '2022-03-31'
 
     test_start_date = '2022-04-01'
-    test_end_date = '2022-05-31'
+    test_end_date = '2022-06-30'
 
     train_hourly = read_demand_data(start_date=train_start_date,
                                     end_date=train_end_date,
