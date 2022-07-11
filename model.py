@@ -209,15 +209,18 @@ class ModelHandler:
 
         dummy = -32
 
-    def predict(self, df_test_data, input_sequence_length, output_sequence_length):
+    def predict(self, df_test_data):
+        print('PREDICT')
 
-        pass
-
-        '''
         df_test = self.pre_process(df=df_test_data, mode=constants.TEST, data_resolution=self.data_resolution)
 
         self.model.eval()
         number_of_test_samples = df_test.shape[0]
+
+        input_sequence_length = self.model_params[constants.INPUT_SEQUENCE_LENGTH]
+        output_sequence_length = self.model_params[constants.OUTPUT_SEQUENCE_LENGTH]
+
+        error_matrix = np.zeros((number_of_test_samples, output_sequence_length))
 
         with torch.no_grad():
             for idx in range(input_sequence_length, number_of_test_samples - output_sequence_length):
@@ -228,15 +231,23 @@ class ModelHandler:
                 x_future = torch.tensor(df_future.drop(columns=[constants.CONSUMPTION]).values, dtype=torch.float32).to(
                     self.device)
                 y_future = torch.tensor(df_future[constants.CONSUMPTION].values, dtype=torch.float32).to(self.device)
-
                 out = self.model(x_past=x_past, x_future=x_future, y_future=y_future)
 
-        out = out * self.scaling_params[constants.CONSUMPTION][constants.STD]
-        out = out + self.scaling_params[constants.CONSUMPTION][constants.MEAN]
+                y_gt = y_future * self.scaling_params[constants.CONSUMPTION][constants.STD] + \
+                       self.scaling_params[constants.CONSUMPTION][constants.MEAN]
+                y_pred = out * self.scaling_params[constants.CONSUMPTION][constants.STD] + \
+                         self.scaling_params[constants.CONSUMPTION][constants.MEAN]
 
-        return out
-        
-        '''
+                y_gt_cpu = y_gt.cpu()
+                y_pred_cpu = y_pred.cpu()
+                error_matrix[idx, :] = abs(y_gt_cpu - y_pred_cpu) / y_gt_cpu
+
+                dummy = -32
+
+        return error_matrix
+
+
+
 
 
     def save(self):
