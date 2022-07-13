@@ -32,7 +32,7 @@ def train(data_resolution, df_train, df_validation):
                                        constants.NUMBER_OF_ENCODER_LAYERS: 1,
                                        constants.HIDDEN_LAYER_SIZE: 256,
                                        constants.TEACHER_FORCING_PROB: 0.50,
-                                       constants.NUMBER_OF_EPOCHS: 1},
+                                       constants.NUMBER_OF_EPOCHS: 15},
                     constants.DAILY: {constants.INPUT_SEQUENCE_LENGTH: 49,
                                       constants.OUTPUT_SEQUENCE_LENGTH: 7,
                                       constants.NUMBER_OF_ENCODER_LAYERS: 1,
@@ -79,9 +79,9 @@ def main(params):
     data_resolution = constants.HOURLY
     df_dict = utils.train_test_val_split(data_resolution=data_resolution)
 
-    experimentation()
+    # experimentation()
     # development()
-    # train(data_resolution=data_resolution, df_train=df_dict[constants.TRAIN], df_validation=df_dict[constants.VALIDATION])
+    train(data_resolution=data_resolution, df_train=df_dict[constants.TRAIN], df_validation=df_dict[constants.VALIDATION])
     # test(data_resolution=data_resolution, df_test=df_dict[constants.TEST])
 
 

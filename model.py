@@ -70,6 +70,12 @@ class ModelHandler:
         self.data_split[mode][constants.START] = df.index.min().date().isoformat()
         self.data_split[mode][constants.END] = df.index.max().date().isoformat()
 
+        if data_resolution == constants.HOURLY:
+            out_df[constants.HOUR] = out_df.index.hour
+            out_df[constants.HOUR_SINE] = sin_transform(values=out_df[constants.HOUR], K=24)
+            out_df[constants.HOUR_COS] = cos_transform(values=out_df[constants.HOUR], K=24)
+            out_df = out_df.drop(columns=[constants.HOUR])
+
         out_df[constants.YEAR_MOD] = \
             (out_df[constants.YEAR] - self.scaling_params[constants.YEAR][constants.MIN]) / \
             (self.scaling_params[constants.YEAR][constants.MAX] - self.scaling_params[constants.YEAR][constants.MIN])
@@ -192,7 +198,6 @@ class ModelHandler:
                 self.train_loss_matrix[epoch, idx - input_sequence_length] = train_loss
 
                 if (idx - input_sequence_length) % validation_period == 0:
-
                     validation_loss = self.validate(df_val=df_val,
                                                     loss_function=loss_function,
                                                     input_sequence_length=input_sequence_length,
@@ -205,7 +210,7 @@ class ModelHandler:
 
                     dummy = -32
 
-        self.save()
+            self.save()  # save after each epoch
 
         dummy = -32
 
@@ -245,10 +250,6 @@ class ModelHandler:
                 dummy = -32
 
         return error_matrix
-
-
-
-
 
     def save(self):
         model_name = f'./out/model_handler_{datetime.datetime.now()}.pkl'
