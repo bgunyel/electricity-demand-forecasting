@@ -1,5 +1,6 @@
 import datetime
 import pickle
+import copy
 
 from torch.utils.data import DataLoader
 import torch
@@ -40,8 +41,50 @@ class ModelHandler:
         self.train_loss_matrix = None
         self.validation_loss_matrix = None
 
-    def load_model(self):
-        pass
+    def initialize_model(self, source_model=None):
+        self.model = EncoderDecoderRNN(input_sequence_length=self.model_params[constants.INPUT_SEQUENCE_LENGTH],
+                                       output_sequence_length=self.model_params[constants.OUTPUT_SEQUENCE_LENGTH],
+                                       input_vector_length=self.model_params[constants.INPUT_VECTOR_LENGTH],
+                                       hidden_vector_size=self.model_params[constants.HIDDEN_LAYER_SIZE],
+                                       n_encoder_layers=self.model_params[constants.NUMBER_OF_ENCODER_LAYERS],
+                                       teacher_forcing_prob=self.model_params[constants.TEACHER_FORCING_PROB],
+                                       device=self.device)
+
+    def copy_from(self, model_handler):
+
+        print(f'TODO: Model Params copying shall be corrected!')
+        self.model_params = copy.deepcopy(model_handler.model_params)
+        self.model_params[constants.INPUT_VECTOR_LENGTH] = 18
+
+        self.scaling_params = copy.deepcopy(model_handler.scaling_params)
+        self.data_resolution = copy.deepcopy(model_handler.data_resolution)
+
+        self.train_loss_matrix = copy.deepcopy(model_handler.train_loss_matrix)
+        self.validation_loss_matrix = copy.deepcopy(model_handler.validation_loss_matrix)
+
+        self.initialize_model(source_model=model_handler)
+
+        print(f'-- DEBUG START --')
+
+        encoder_params_dict = dict()
+        decoder_params_dict = dict()
+
+        for pn, p in model_handler.model.encoder.named_parameters():
+            encoder_params_dict[pn] = p
+
+        for pn, p in model_handler.model.decoder.named_parameters():
+            decoder_params_dict[pn] = p
+
+        for pn, p in self.model.encoder.named_parameters():
+            p.data = encoder_params_dict[pn].data.to(self.device)
+
+        for pn, p in self.model.decoder.named_parameters():
+            p.data = decoder_params_dict[pn].data.to(self.device)
+
+
+        print(f'-- DEBUG END --')
+
+        dummy = -32
 
     def save_model(self):
         pass
@@ -104,6 +147,9 @@ class ModelHandler:
         out_df[constants.BEFORE_AFTER_HOLIDAY] = out_df[constants.BEFORE_AFTER_HOLIDAY].astype('float64')
         out_df[constants.BRIDGE_DAY] = out_df[constants.BRIDGE_DAY].astype('float64')
 
+        if mode == constants.TRAIN:
+            self.model_params[constants.INPUT_VECTOR_LENGTH] = out_df.shape[1]
+
         return out_df
 
     def post_process(self, df):
@@ -153,13 +199,7 @@ class ModelHandler:
         df_tr = self.pre_process(df=df_train, mode=constants.TRAIN, data_resolution=data_resolution)
         df_val = self.pre_process(df=df_validation, mode=constants.VALIDATION, data_resolution=data_resolution)
 
-        self.model = EncoderDecoderRNN(input_sequence_length=self.model_params[constants.INPUT_SEQUENCE_LENGTH],
-                                       output_sequence_length=self.model_params[constants.OUTPUT_SEQUENCE_LENGTH],
-                                       input_vector_length=df_tr.shape[1],
-                                       hidden_vector_size=self.model_params[constants.HIDDEN_LAYER_SIZE],
-                                       n_encoder_layers=self.model_params[constants.NUMBER_OF_ENCODER_LAYERS],
-                                       teacher_forcing_prob=self.model_params[constants.TEACHER_FORCING_PROB],
-                                       device=self.device)
+        self.initialize_model()
 
         input_sequence_length = self.model_params[constants.INPUT_SEQUENCE_LENGTH]
         output_sequence_length = self.model_params[constants.OUTPUT_SEQUENCE_LENGTH]

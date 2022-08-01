@@ -4,6 +4,8 @@ import numpy as np
 import datetime
 import matplotlib.pyplot as plt
 import pickle
+import copy
+import torch
 
 import constants
 import utils
@@ -58,13 +60,11 @@ def test(data_resolution, df_test):
     with open('./out/model_handler_2022-07-15 02:09:18.373973.pkl', 'rb') as file:
         model_handler = pickle.load(file)
 
-    handler = model.ModelHandler(model_params=model_handler.model_params)
-    handler.scaling_params = model_handler.scaling_params
-    handler.model = model_handler.model
-    handler.model.to(handler.device)
-    handler.data_resolution = model_handler.data_resolution
-    handler.train_loss_matrix = model_handler.train_loss_matrix
-    handler.validation_loss_matrix = model_handler.validation_loss_matrix
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    handler = model.ModelHandler(model_params=None)
+    handler.copy_from(model_handler=model_handler)
+
 
     '''
     number_of_epochs = handler.train_loss_matrix.shape[0]

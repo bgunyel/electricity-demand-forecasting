@@ -75,4 +75,5 @@ OUTPUT_SEQUENCE_LENGTH: Final = 'output_sequence_length'
 HIDDEN_LAYER_SIZE: Final = 'hidden_layer_size'
 NUMBER_OF_ENCODER_LAYERS: Final = 'number_of_encoder_layers'
 TEACHER_FORCING_PROB: Final = 'teacher_forcing_prob'
+INPUT_VECTOR_LENGTH: Final = 'input_vector_length'
 
