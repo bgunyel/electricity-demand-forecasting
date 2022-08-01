@@ -48,8 +48,6 @@ class ModelHandler:
 
     def pre_process(self, df, mode, data_resolution):
 
-        print(f'Hour should be added as a feature in hourly data resolution!!!!!!!')
-
         out_df = df.copy(deep=True)
 
         if mode == constants.TRAIN:
