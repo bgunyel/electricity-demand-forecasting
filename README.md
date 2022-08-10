@@ -20,11 +20,13 @@ On the other hand, an electricity producer who has to give hourly offers on the 
 
 Spot markets are divided into two; Day-Ahead Market (DAM) and Intra-Day Market (IDM). The DAM is the market where the electricity price for each hour of the next day is determined by auction and has a larger transaction volume. On the other hand, IDM enables the participants to change their position in the Day-Ahead Market for a certain amount of time before electricity is physically transmitted. Any imbalance in the electricity grid caused by a mismatch of demand and supply is compensated after the closure of the IDM. Hence, having precise demand forecasts will provide high value to all parties in the electricity market.
 
-This project proposes an algorithm and implementation for forecasting hourly demand in the next 24-hour time frame. The forecasting system can be utilized by market players on the supply side and the regulatory bodies most interested in balancing the supply and demand. 
+This project proposes an algorithm and implementation for forecasting hourly demand in the next 24-hour time frame. The forecasting system can be utilized by market players on the supply side and the regulatory bodies most interested in balancing the supply and demand. The system is trained and tested on Turkish electricity market data and hence, very few features are special to Turkey. Nevertheless the system can be utilized in any electricity market with minimal modifications (and re-training).
 
 ## Data Analysis
 
 TODO TODO TODO
+
+Data is here [1](#1)
 
 ## Forecasting Algorithms
 
@@ -33,3 +35,8 @@ TODO TODO TODO
 ## Experimental Results
 
 TODO TODO TODO
+
+## References
+
+### [1] TODO TODO TODO
+### [2] TODO TODO TODO
