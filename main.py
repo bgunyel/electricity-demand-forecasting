@@ -47,8 +47,6 @@ def train(data_resolution, df_train, df_validation):
                     constants.DAILY: {constants.INPUT_SEQUENCE_LENGTH: 49,
                                       constants.OUTPUT_SEQUENCE_LENGTH: 7}}
 
-
-
     model_handler = model.ModelHandler(model_params=model_params[data_resolution])
     model_handler.train(df_train=df_train,
                         df_validation=df_validation,
@@ -57,14 +55,43 @@ def train(data_resolution, df_train, df_validation):
 
 
 def test(data_resolution, df_test):
-    with open('./out/model_handler_2022-07-15 02:09:18.373973.pkl', 'rb') as file:
-        model_handler = pickle.load(file)
+    model_file_path_list = ['model_handler_2022-07-13 14:12:01.879651.pkl',
+                            'model_handler_2022-07-13 16:46:40.140531.pkl',
+                            'model_handler_2022-07-13 19:21:10.328384.pkl',
+                            'model_handler_2022-07-13 21:55:26.928405.pkl',
+                            'model_handler_2022-07-14 00:28:32.513635.pkl',
+                            'model_handler_2022-07-14 03:02:42.920955.pkl',
+                            'model_handler_2022-07-14 05:35:06.259790.pkl',
+                            'model_handler_2022-07-14 08:09:39.471745.pkl',
+                            'model_handler_2022-07-14 10:44:07.685136.pkl',
+                            'model_handler_2022-07-14 13:17:48.144201.pkl',
+                            'model_handler_2022-07-14 15:51:22.106755.pkl',
+                            'model_handler_2022-07-14 18:26:10.524638.pkl',
+                            'model_handler_2022-07-14 21:00:35.171787.pkl',
+                            'model_handler_2022-07-14 23:35:12.881689.pkl',
+                            'model_handler_2022-07-15 02:09:18.373973.pkl']
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    percent_error_after_each_epoch = np.zeros([len(model_file_path_list), 1])
+    percent_error_vec_after_each_epoch = np.zeros([len(model_file_path_list), 24])
 
+    for idx, model_file_name in enumerate(model_file_path_list):
+        print(f'Epoch: {idx+1} -- {model_file_name} @ {datetime.datetime.now()}')
+        model_file_path = os.path.join(constants.OUT_FOLDER, model_file_name)
+        handler = model.ModelHandler(model_params=None)
+        handler.load_model(model_file_path=model_file_path)
+
+        error_matrix = handler.predict(df_test_data=df_test)
+        percent_error_matrix = error_matrix * 100
+        percent_error_vec = np.mean(percent_error_matrix[168:2160, :], axis=0)
+        percent_error_vec_after_each_epoch[idx, :] = percent_error_vec
+        percent_error = np.mean(percent_error_vec)
+        percent_error_after_each_epoch[idx] = percent_error
+        print(f'Percent Error: {percent_error}')
+
+
+    model_file_path = './out/model_handler_2022-07-15 02:09:18.373973.pkl'
     handler = model.ModelHandler(model_params=None)
-    handler.copy_from(model_handler=model_handler)
-
+    handler.load_model(model_file_path=model_file_path)
 
     '''
     number_of_epochs = handler.train_loss_matrix.shape[0]
@@ -88,10 +115,6 @@ def test(data_resolution, df_test):
     '''
 
 
-    error_matrix = handler.predict(df_test_data=df_test)
-    percent_error_matrix = error_matrix * 100
-    percent_error_vec = np.mean(percent_error_matrix[168:2160, :], axis=0)
-    percent_error = np.mean(percent_error_vec)
 
     dummy = -32
 
@@ -106,10 +129,6 @@ def main(params):
     # development()
     # train(data_resolution=data_resolution, df_train=df_dict[constants.TRAIN], df_validation=df_dict[constants.VALIDATION])
     test(data_resolution=data_resolution, df_test=df_dict[constants.TEST])
-
-
-
-
 
     dummy = -32
 

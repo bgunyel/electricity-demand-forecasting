@@ -86,8 +86,11 @@ class ModelHandler:
 
         dummy = -32
 
-    def save_model(self):
-        pass
+    def load_model(self, model_file_path):
+        with open(model_file_path, 'rb') as file:
+            model_handler = pickle.load(file)
+
+        self.copy_from(model_handler=model_handler)
 
     def pre_process(self, df, mode, data_resolution):
 
