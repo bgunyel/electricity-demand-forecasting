@@ -26,7 +26,9 @@ This project proposes an algorithm and implementation for forecasting hourly dem
 
 TODO TODO TODO
 
-Data is here [1](#1)
+Hello Hello [[1]](#1)
+
+[Relative link](#1)
 
 ## Forecasting Algorithms
 
@@ -38,5 +40,7 @@ TODO TODO TODO
 
 ## References
 
-### [1] TODO TODO TODO
-### [2] TODO TODO TODO
+<a id="1">[1]</a> 
+Dijkstra, E. W. (1968). 
+Go to statement considered harmful. 
+Communications of the ACM, 11(3), 147-148.
