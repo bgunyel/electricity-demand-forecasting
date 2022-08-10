@@ -1,5 +1,9 @@
 # Electricity Demand Forecasting
 
+## Table of Contents
+* [Introduction](#introduction)
+* [Data Analysis] (#data-analysis)
+
 ## Introduction
 In the rapidly developing world, energy needs are increasing at the same pace. Since the industrial revolution, countries with access to energy resources have come to economically strong positions. On the other hand, the ever-increasing macro-economic and micro-economic competition between different entities is forcing the absolute need for efficient energy use in order to achieve economic efficacy and/or efficiency.
 
@@ -16,3 +20,6 @@ Spot markets are divided into two; Day-Ahead Market (DAM) and Intra-Day Market (
 
 This project proposes an algorithm and implementation for forecasting hourly demand in the next 24-hour time frame. The forecasting system can be utilized by market players on the supply side and the regulatory bodies most interested in balancing the supply and demand. 
 
+## Data Analysis
+
+TODO TODO TODO
