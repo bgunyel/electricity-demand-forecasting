@@ -3,6 +3,7 @@
 ## Table of Contents
 * [Introduction](#introduction)
 * [Data Analysis](#data-analysis)
+  - [Examination of Covid-19 Impact](#examination-of-covid-19-impact)
 * [Forecasting Algorithms](#forecasting-algorithms)
 * [Experimental Results](#experimental-results)
 
@@ -30,18 +31,24 @@ Hourly electricity demand data between 2017-01-01 and 2022-06-30 are utilized in
 
 ![hourly_2022-04-01_2022-06-30](./images/hourly_2022-04-01_2022-06-30.png)
 
+As seen in the above figure, the electricity consumption shows regular patterns, higher during business days than weekend days. The sharp drop at the beginning of May reflects the lower electricity usage during the Ramazan Feast.
+
+The daily pattern in demand (in MWh) can be seen in the following figure.
+
+![daily-average-consumptions](./images/daily-average-consumptions.png)
+
+As expected, the business days have higher average consumption than weekend days. In addition, Saturdays, which are a working day in some companies, have higher average consumption than Sundays. On the other hand, the intra-day consumption stays at the highest level between 10 am and 8 pm.
+
+### Examination of Covid-19 Impact
+
+One recent question that deserves attention is whether the Covid-19 Pandemic impacts electricity consumption. For this purpose, the years 2017, 2018, and 2019 are labeled “Before Covid”, whereas 2020 is marked as “During Covid”. On the other hand, the years 2021 and 2022 are examined as “After Covid.” The following figure shows the daily averages corresponding to those groups.
 
 
 
-
-
-
+### Examination of Schools' Impact
 
 TODO TODO TODO
 
-Hello Hello ([EXIST / EPIAS. (2022)](#epias-2022))
-
-Another citation ([Erişen, E. (2013)](#erisen-2013))
 
 
 ## Forecasting Algorithms
