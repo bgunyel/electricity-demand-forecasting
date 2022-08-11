@@ -42,11 +42,11 @@ TODO TODO TODO
 ## References
 
 <a id="epias-2022"></a> 
-EXIST / EPIAS. (2022) 
-EXIST Transparency Platform 
+EXIST / EPIAS. (2022),  
+_EXIST Transparency Platform,_  
 https://seffaflik.epias.com.tr/transparency/
 
 <a id="erisen-2013"></a> 
-Erişen, E. (2013) 
-On the Parametric and Non-Parametric Prediction Methods for Electricity Load Forecasting 
+Erişen, E. (2013),  
+_On the Parametric and Non-Parametric Prediction Methods for Electricity Load Forecasting,_  
 M.Sc. Thesis, Middle East Technical University
