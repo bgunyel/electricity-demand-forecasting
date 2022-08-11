@@ -76,7 +76,50 @@ This is not an easy question to answer with only 6 years of data because Ramazan
 
 ### Extracted Features and Data Pre-Processing
 
-TODO
+The following features are extracted for each data sample:
+
+* week_day:
+ - Monday:1
+ - Tuesday:2
+ - Wednesday:3
+ - Thursday:4
+ - Friday:5
+ - Saturday:6
+ - Sunday:7
+* weekend:
+ - 1 if the sample day is a weekend day
+ - 0 else
+* year:
+ - year of the data sample
+* month:
+ - the month of the sample between [1, 12]
+* day:
+ - day of the sample within the month (between [1, 31])
+* hour:
+ - hour of the data sample between [0, 23]
+* quarter:
+ - January, February, March: 1
+ - April, May, June: 2
+ - July, August, September: 3
+ - October, November, December: 4
+* schools_closed:
+ - 1 if the schools are on holiday
+ - 0 else
+* ramazan:
+ - 1 if the sample is in Ramazan
+ - 0 else
+* holiday:
+ - 1 if the day of the sample is on holiday (national or religious)
+ - 0 else
+* before_after_holiday:
+ - 1 if the day of the sample is either just before or just after a holiday
+ - 0 else
+* bridge_day:
+ - 1 if the day of the sample is a bridge day
+ - 0 else
+
+The interested reader can consult ([Erişen, 2013](#erisen-2013)) for more details on feature extraction.
+
 
 
 
