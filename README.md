@@ -1,6 +1,6 @@
 # Electricity Demand Forecasting
 
-*** This project is being actively developed. Stay tuned! ***
+***This project is being actively developed. Stay tuned!***
 
 ## Table of Contents
 * [Introduction](#introduction)
