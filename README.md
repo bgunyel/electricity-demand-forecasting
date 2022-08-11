@@ -26,7 +26,9 @@ This project proposes an algorithm and implementation for forecasting hourly dem
 
 TODO TODO TODO
 
-Hello Hello ([Dijkstra 1968](#dijkstra-1968))
+Hello Hello ([EXIST / EPIAS. (2022)](#epias-2022))
+
+Another citation ([Erişen, E. (2013)](#erisen-2013))
 
 
 ## Forecasting Algorithms
@@ -39,7 +41,12 @@ TODO TODO TODO
 
 ## References
 
-<a id="dijkstra-1968"></a> 
-Dijkstra, E. W. (1968). 
-Go to statement considered harmful. 
-Communications of the ACM, 11(3), 147-148.
+<a id="epias-2022"></a> 
+EXIST / EPIAS. (2022) 
+EXIST Transparency Platform 
+https://seffaflik.epias.com.tr/transparency/
+
+<a id="erisen-2013"></a> 
+Erişen, E. (2013) 
+On the Parametric and Non-Parametric Prediction Methods for Electricity Load Forecasting 
+M.Sc. Thesis, Middle East Technical University
