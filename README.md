@@ -79,46 +79,67 @@ This is not an easy question to answer with only 6 years of data because Ramazan
 The following features are extracted for each data sample:
 
 * week_day:
- - Monday:1
- - Tuesday:2
- - Wednesday:3
- - Thursday:4
- - Friday:5
- - Saturday:6
- - Sunday:7
+  - Monday:1
+  - Tuesday:2
+  - Wednesday:3
+  - Thursday:4
+  - Friday:5
+  - Saturday:6
+  - Sunday:7
 * weekend:
- - 1 if the sample day is a weekend day
- - 0 else
+  - 1 if the sample day is a weekend day
+  - 0 else
 * year:
- - year of the data sample
+  - year of the data sample
 * month:
- - the month of the sample between [1, 12]
+  - the month of the sample between [1, 12]
 * day:
- - day of the sample within the month (between [1, 31])
+  - day of the sample within the month (between [1, 31])
 * hour:
- - hour of the data sample between [0, 23]
+  - hour of the data sample between [0, 23]
 * quarter:
- - January, February, March: 1
- - April, May, June: 2
- - July, August, September: 3
- - October, November, December: 4
+  - January, February, March: 1
+  - April, May, June: 2
+  - July, August, September: 3
+  - October, November, December: 4
 * schools_closed:
- - 1 if the schools are on holiday
- - 0 else
+  - 1 if the schools are on holiday
+  - 0 else
 * ramazan:
- - 1 if the sample is in Ramazan
- - 0 else
+  - 1 if the sample is in Ramazan
+  - 0 else
 * holiday:
- - 1 if the day of the sample is on holiday (national or religious)
- - 0 else
+  - 1 if the day of the sample is on holiday (national or religious)
+  - 0 else
 * before_after_holiday:
- - 1 if the day of the sample is either just before or just after a holiday
- - 0 else
+  - 1 if the day of the sample is either just before or just after a holiday
+  - 0 else
 * bridge_day:
- - 1 if the day of the sample is a bridge day
- - 0 else
+  - 1 if the day of the sample is a bridge day
+  - 0 else
 
 The interested reader can consult ([Erişen, 2013](#erisen-2013)) for more details on feature extraction.
+
+The whole data set is split as follows:
+
+* __train set:__ [2017-01-01, 2021-12-31]
+* __validation set:__ [2022-01-01, 2022-03-31]
+* __test set:__ [2022-04-01, 2022-06-30]
+
+For each sample, the consumption data is normalized to zero-mean and unit standard deviation. For this purpose, the mean and standard deviation computed over the training set is utilized. For the year feature, min-max scaling is applied.
+
+Sine and cosine transforms are applied for the features week_day, month, day, hour, and quarter.
+
+* week_day_sine = sin(2π * week_day / 7)
+* week_daycos = cos(2π * week_day / 7)
+* month_sine = sin(2π * month / 12)
+* month_cos = cos(2π * month / 12)
+* day_sine = sin(2π * day / 31)
+* day_cos = cos(2π * day / 31)
+* hour_sine = sin(2π * hour / 24)
+* hour_cos = cos(2π * hour / 24)
+* quarter_sine = sin(2π * quarter / 4)
+* quarter_cos = cos(2π * quarter / 4)
 
 
 
