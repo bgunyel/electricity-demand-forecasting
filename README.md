@@ -26,9 +26,7 @@ This project proposes an algorithm and implementation for forecasting hourly dem
 
 TODO TODO TODO
 
-
-I get 10 times more traffic from [Google] [1] than from [Yahoo] [2] or [MSN] [3].
-
+Hello Hello [(Dijkstra 1968)](#dijkstra-1968)
 
 
 ## Forecasting Algorithms
@@ -41,6 +39,7 @@ TODO TODO TODO
 
 ## References
 
-[1]: http://google.com/        "Google"
-[2]: http://search.yahoo.com/  "Yahoo Search"
-[3]: http://search.msn.com/    "MSN Search"
+<a id="dijkstra-1968"></a> 
+Dijkstra, E. W. (1968). 
+Go to statement considered harmful. 
+Communications of the ACM, 11(3), 147-148.
