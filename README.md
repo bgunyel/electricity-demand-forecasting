@@ -5,6 +5,8 @@
 * [Data Analysis](#data-analysis)
   - [Examination of Covid-19 Impact](#examination-of-covid-19-impact)
   - [Examination of Schools' Impact](#examination-of-schools-impact)
+  - [Examination of Ramazan Impact](#examination-of-ramazan-impact)
+  - [Extracted Features and Data Pre-Processing](#extracted-features-and-data-pre-processing)
 * [Forecasting Algorithms](#forecasting-algorithms)
 * [Experimental Results](#experimental-results)
 
@@ -54,11 +56,26 @@ Is this an impact of the Covid Pandemic, or is there already an increasing trend
 
 A careful examination of the above figure reveals that there is not a clear increasing trend in consumption throughout 2017, 2018, and 2019. On the other hand, electricity consumption in 2021 is slightly higher than in 2022. Therefore, although the consumption after Covid (2021 & 2022) is higher than the consumption in previous years, any apparent reason could not be found in this analysis.
 
-
-
 ### Examination of Schools' Impact
 
-TODO TODO TODO
+One other interesting question to examine is whether schools have a significant impact on electricity consumption. For this purpose, the following figure shows the 7-day rolling average of daily electricity consumption for different years.
+
+![schools-impact](./images/schools-impact.png)
+
+Having a careful look at the above figure reveals an interesting relationship between school closure dates and electricity consumption. It is evident that electricity consumption generally is higher when the schools are closed. This can easily be explained by the fact that most of the school closures happen in summer when electricity consumption increases due to cooling needs. Although there is only a correlation but no causation relationship between schools and electricity consumption, this is most of the time more than enough for a machine learning algorithm which is the backbone of forecasting.
+
+### Examination of Ramazan Impact
+
+Another interesting question to analyze is whether Ramazan has a significant impact on electricity consumption. For this analysis, the following figure presents the 7-day average of daily electricity consumption separately for each year. Days falling in Ramazan are indicated with a marker (*).
+
+![ramazan-impact](./images/ramazan-impact.png)
+
+This is not an easy question to answer with only 6 years of data because Ramazan is sliding backward by 10-11 days every year. According to the above figure, electricity consumption increases throughout Ramazan and makes a peak just before Ramazan Feast in 2017, 2018, 2019, and 2020. On the other hand, this behavior is not observed during Ramazan in 2021 and 2022. It is not very easy to separate whether this behavior depends on Ramazan's sliding characteristic or is just a coincidence. More data should be examined to find a statistically significant answer.
+
+### Extracted Features and Data Pre-Processing
+
+TODO
+
 
 
 
