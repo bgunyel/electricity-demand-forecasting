@@ -4,6 +4,7 @@
 * [Introduction](#introduction)
 * [Data Analysis](#data-analysis)
   - [Examination of Covid-19 Impact](#examination-of-covid-19-impact)
+  - [Examination of Schools' Impact](#examination-of-schools-impact)
 * [Forecasting Algorithms](#forecasting-algorithms)
 * [Experimental Results](#experimental-results)
 
@@ -41,7 +42,17 @@ As expected, the business days have higher average consumption than weekend days
 
 ### Examination of Covid-19 Impact
 
-One recent question that deserves attention is whether the Covid-19 Pandemic impacts electricity consumption. For this purpose, the years 2017, 2018, and 2019 are labeled “Before Covid”, whereas 2020 is marked as “During Covid”. On the other hand, the years 2021 and 2022 are examined as “After Covid.” The following figure shows the daily averages corresponding to those groups.
+One recent question that deserves attention is whether the Covid-19 Pandemic impacts electricity consumption. For this purpose, the years 2017, 2018, and 2019 are labeled “Before Covid”, whereas 2020 is marked as “During Covid”. On the other hand, the years 2021 and 2022 are examined as “After Covid.” The following figure shows the daily averages (MWh) corresponding to those groups.
+
+![daily-average-consumptions_covid](./images/daily-average-consumptions_covid.png)
+
+Careful examination of the above figure reveals that the general pattern between business days and weekend days is preserved before, during, and after Covid. In addition, the consumption stays close to its peak level between 10 am and 8 pm in all of the sub-figures. However, there is a definite increase in the general level of electricity consumption after Covid, when compared with consumption before Covid and during Covid. 
+
+Is this an impact of the Covid Pandemic, or is there already an increasing trend throughout the years? The following figure shows the average daily consumption for all years separately.
+
+![daily-averages_all-years](./images/daily-averages_all-years.png)
+
+A careful examination of the above figure reveals that there is not a clear increasing trend in consumption throughout 2017, 2018, and 2019. On the other hand, electricity consumption in 2021 is slightly higher than in 2022. Therefore, although the consumption after Covid (2021 & 2022) is higher than the consumption in previous years, any apparent reason could not be found in this analysis.
 
 
 
