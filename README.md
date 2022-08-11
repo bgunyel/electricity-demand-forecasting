@@ -26,7 +26,7 @@ This project proposes an algorithm and implementation for forecasting hourly dem
 
 TODO TODO TODO
 
-Hello Hello [(Dijkstra 1968)](#dijkstra-1968)
+Hello Hello ([Dijkstra 1968](#dijkstra-1968))
 
 
 ## Forecasting Algorithms
