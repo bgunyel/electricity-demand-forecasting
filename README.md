@@ -142,18 +142,48 @@ Sine and cosine transforms are applied for the features week_day, month, day, ho
 * quarter_cos = cos(2π * quarter / 4)
 
 
-
-
-
 ## Forecasting Algorithms
 
-TODO TODO TODO
+Taking an ordered set of input samples and generating an ordered set of outputs is defined as sequence-to-sequence learning in the field of machine learning ([Sutskever, 2014](#sutskever-2014)) and has long been known, especially in natural language processing (NLP) domain ([Cho, 2014-a](#cho-2014-a), [Cho, 2014-b](#cho-2014-b)). In recent years, there have been some studies that apply sequence-to-sequence learning to solve multi-step forecasting problems in time-series data ([Phandoidaen & Richter, 2020](#phandoidaen-2020)). 
+
+Sequence-to-sequence learning methods are studied in this project due to their superiority in multi-step forecasting problems.
+
+### Encoder-Decoder Architecture
+
+The general architecture of an encoder-decoder system can be viewed in the following figure ([Kumaran, 2020](#kumaran-2020)). 
+
+![encoder-decoder](https://miro.medium.com/max/700/1*62xsdc5F5DNdLXluQojeBg.png)
+
+One important point to note is that this drawing is a “time-unrolled” scheme, meaning that there is only one GRU Cell in the Encoder and there is only one Decoder Cell in the Decoder. The GRU Cell and the Decoder Cell carries “hidden state” information from the previous time instant to the next. The advantage of using time-unrolled drawing in architectures that include recurrent neural networks (RNN) is that it improves understanding of the logic behind training. Encoder-Decoder architectures can be implemented with vanilla RNNs ([Dupond, 2019](#dupond-2019)), Gated Recurrent Units (GRU) ([Cho, 2014-b](#cho-2014-b)) or Long Short-Term Memory RNNs (LSTM) ([Hochreiter & Schmidhuber, 1997](#hochreiter-schmidhuber-1997)).
+
+To have a general understanding, it will be beneficial to inspect the inner structure of vanilla RNN.
+
+$ x = {-b \pm \sqrt{b^2-4ac} \over 2a} $
+
+
 
 ## Experimental Results
 
 TODO TODO TODO
 
 ## References
+
+<a id="cho-2014-a"></a> 
+Cho, K., van Merrienboer, B., Bahdanau, D., & Bengio, Y. (2014), 
+_On the Properties of Neural Machine Translation: Encoder-Decoder Approaches,_
+Eighth Workshop on Syntax, Semantics and Structure in Statistical Translation (SSST-8),
+arXiv:1409.1259
+
+<a id="cho-2014-b"></a>
+Cho, K., van Merrienboer, B., Gulcehre, C., Bahdanau, D., Bougares, F., Schwenk, H., & Bengio, Y. (2014),
+_Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation,_
+Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing (EMNLP),
+arXiv:1406.1078
+
+<a id="dupond-2019"></a>
+Dupond, S. (2019),
+_A thorough review on the current advance of neural network structures,_
+Annual Reviews in Control, 14, 200-230
 
 <a id="epias-2022"></a> 
 EXIST / EPIAS. (2022), 
@@ -164,3 +194,24 @@ https://seffaflik.epias.com.tr/transparency/
 Erişen, E. (2013), 
 _On the Parametric and Non-Parametric Prediction Methods for Electricity Load Forecasting,_ 
 M.Sc. Thesis, Middle East Technical University
+
+<a id="hochreiter-schmidhuber-1997"></a>
+Hochreiter, S., & Schmidhuber, J. (1997),
+_Long Short-term Memory,_
+Neural Computation, 9(8), 1735-80
+
+<a id="kumaran-2020"></a>
+Kumaran, G. (2020, June 9),
+_Encoder-Decoder Model for Multistep Time Series Forecasting Using PyTorch,_
+Towards Data Science ([link to the article](https://towardsdatascience.com/encoder-decoder-model-for-multistep-time-series-forecasting-using-pytorch-5d54c6af6e60))
+
+<a id="phandoidaen-2020"></a>
+Phandoidaen, N., Richter, S. (2020),
+_Forecasting time series with encoder-decoder neural networks,_
+arXiv:2009.08848
+
+<a id="sutskever-2014"></a>
+Sutskever, I., Vinyals, O., & Le, Q. V. (2014),
+_Sequence to Sequence Learning with Neural Networks,_
+Proceedings of the International Conference on Neural Information Processing Systems, 2, 3104-3112
+
