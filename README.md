@@ -158,7 +158,8 @@ One important point to note is that this drawing is a “time-unrolled” scheme
 
 To have a general understanding, it will be beneficial to inspect the inner structure of vanilla RNN.
 
-$ x = {-b \pm \sqrt{b^2-4ac} \over 2a} $
+
+* $\sqrt{3x-1}+(1+x)^2$
 
 
 
