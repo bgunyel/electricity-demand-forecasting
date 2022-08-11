@@ -47,6 +47,6 @@ _EXIST Transparency Platform,_
 https://seffaflik.epias.com.tr/transparency/
 
 <a id="erisen-2013"></a> 
-Erişen, E. (2013),  
-_On the Parametric and Non-Parametric Prediction Methods for Electricity Load Forecasting,_  
+Erişen, E. (2013), 
+_On the Parametric and Non-Parametric Prediction Methods for Electricity Load Forecasting,_ 
 M.Sc. Thesis, Middle East Technical University
