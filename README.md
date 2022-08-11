@@ -26,7 +26,9 @@ This project proposes an algorithm and implementation for forecasting hourly dem
 
 Data used in this project is obtained from the official website of Energy Exchange Istanbul (EXIST) or Enerji Piyasaları İşletme A.Ş. (EPİAŞ) by its Turkish name ([EXIST / EPIAS. (2022)](#epias-2022)). Therefore, the two acronyms EXIST and EPİAŞ will be used interchangeably.
 
-Hourly electricity demand data between 2017-01-01 and 2022-06-30 are utilized in this study. For a visual introduction, ![the following figure](./images/hourly_2022-04-01_2022-06-30.png) presents the hourly electricity consumption in Turkey between 2022-04-01 and 2022-06-30.
+Hourly electricity demand data between 2017-01-01 and 2022-06-30 are utilized in this study. For a visual introduction, the following figure presents the hourly electricity consumption in Turkey between 2022-04-01 and 2022-06-30.
+
+![hourly_2022-04-01_2022-06-30](./images/hourly_2022-04-01_2022-06-30.png)
 
 
 
