@@ -211,6 +211,18 @@ def convert_hourly_to_daily(df):
     return out
 
 
+def convert_hourly_to_monthly(df_hourly):
+    df_daily = convert_hourly_to_daily(df=df_hourly)
+    df_grouped = df_daily.groupby([constants.YEAR, constants.MONTH])
+
+    out = pd.DataFrame()
+    out[constants.CONSUMPTION] = df_grouped[constants.CONSUMPTION].sum()
+    out.index = out.index.map(lambda idx: f'{idx[0]:02}-{idx[1]:02}')
+
+    return out
+
+
+
 def read_demand_data_for_all_years():
     years = [2017, 2018, 2019, 2020, 2021, 2022]
     df_dict = dict()

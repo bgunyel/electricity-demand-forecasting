@@ -2,6 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from statsmodels.tsa.stattools import acf, pacf
 
+import wandb
+
 import constants
 import utils
 
@@ -248,23 +250,87 @@ def examine_acf():
 
     n_lags = 30
     acf_daily = acf(df_daily[constants.CONSUMPTION], nlags=n_lags)
+    pacf_daily = pacf(df_daily[constants.CONSUMPTION], nlags=n_lags)
     lags = [*range(0, n_lags + 1)]
 
     axes[0].stem(lags, acf_daily)
     axes[0].grid(visible=True)
     axes[0].set_title('Daily ACF')
 
-    n_lags = 50
+    axes[1].stem(lags, pacf_daily)
+    axes[1].grid(visible=True)
+    axes[1].set_title('Daily P-ACF')
+
+    plt.show()
+
+
+    ### Hourly
+
+    fig2, axes2 = plt.subplots(2, 1, figsize=(18, 8))
+
+    n_lags = 24
     acf_hourly = acf(df_hourly[constants.CONSUMPTION], nlags=n_lags)
+    pacf_hourly, ci_hourly = pacf(df_hourly[constants.CONSUMPTION], nlags=n_lags, alpha=0.05)
+
+    pacf_hourly = pacf_hourly.res
+    ci_hourly[0, :] = ci_hourly[0, :] - pacf_hourly
+    ci_hourly[1, :] = ci_hourly[1, :] - pacf_hourly
     lags = [*range(0, n_lags + 1)]
 
-    axes[1].stem(lags, acf_hourly)
-    axes[1].grid(visible=True)
-    axes[1].set_title('Hourly ACF')
+    axes2[0].stem(lags, acf_hourly)
+    axes2[0].grid(visible=True)
+    axes2[0].set_title('Hourly ACF')
+
+    axes2[1].stem(lags, pacf_hourly)
+    axes2[1].plot(lags, ci_hourly[0, :])
+    axes2[1].plot(lags, ci_hourly[1, :])
+    axes2[1].grid(visible=True)
+    axes2[1].set_title('Hourly P-ACF')
 
     plt.show()
 
     dummy = -32
 
 
+def examine_monthly_data():
+    start_date = '2017-01-01'
+    end_date = '2022-09-30'
 
+    df_hourly = utils.read_demand_data(start_date=start_date, end_date=end_date, data_folder=constants.EPIAS_FOLDER)
+    df_monthly = utils.convert_hourly_to_monthly(df_hourly=df_hourly)
+    # df_monthly['Annualized Demand'] = df_monthly.rolling(window=12)[constants.CONSUMPTION].sum()
+    df_monthly[constants.ROLLING_MONTHLY_AVERAGE] = df_monthly.rolling(window=12)[constants.CONSUMPTION].mean()
+
+    '''
+    plt.figure(figsize=(18, 8))
+    plt.plot(df_monthly.index, df_monthly[constants.ROLLING_MONTHLY_AVERAGE], label='Rolling(12) Monthly Average')
+    plt.plot(df_monthly.index, df_monthly[constants.CONSUMPTION], label='Monthly')
+    plt.xticks(rotation=45)
+    plt.grid(visible=True)
+    plt.title('Electricity Demand (MWh)')
+    #plt.show()
+    '''
+
+    fig, ax = plt.subplots(figsize=(18, 8))
+    ax.plot(df_monthly.index, df_monthly[constants.ROLLING_MONTHLY_AVERAGE], label='Rolling(12) Monthly Average')
+    ax.plot(df_monthly.index, df_monthly[constants.CONSUMPTION], label='Monthly')
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
+    ax.grid(visible=True)
+    ax.set_title('Electricity Demand (MWh)')
+
+    dummy = -32
+
+    run = wandb.init(project="electricity-demand-forecasting", entity="bertan-gunyel", name='visualization')
+    table = wandb.Table(dataframe=df_monthly.reset_index())
+
+    line_plot = wandb.plot.line_series(xs=df_monthly.index.to_list(),
+                                       ys=[df_monthly[constants.CONSUMPTION].to_list(), df_monthly[constants.ROLLING_MONTHLY_AVERAGE].to_list()],
+                                       keys=[constants.CONSUMPTION, constants.ROLLING_MONTHLY_AVERAGE],
+                                       title='Electricity Demand', xname='Months')
+
+    wandb.log({'electricity-demand-chart': line_plot})
+    wandb.log({'electricity-demand-table': table})
+
+
+    # wandb.log({"chart": ax})
+    run.finish()

@@ -15,6 +15,7 @@ MONTH: Final = 'month'
 DAY: Final = 'day'
 QUARTER: Final = 'quarter'
 HOUR: Final = 'hour'
+ROLLING_MONTHLY_AVERAGE: Final = 'Rolling Monthly Average'
 
 MONDAY: Final = 'Monday'
 TUESDAY: Final = 'Tuesday'

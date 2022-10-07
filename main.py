@@ -25,6 +25,9 @@ def experimentation():
 
 
 def development():
+
+    stats.examine_monthly_data()
+
     dummy = -32
 
 
@@ -126,9 +129,9 @@ def main(params):
     df_dict = utils.train_test_val_split(data_resolution=data_resolution)
 
     # experimentation()
-    # development()
+    development()
     # train(data_resolution=data_resolution, df_train=df_dict[constants.TRAIN], df_validation=df_dict[constants.VALIDATION])
-    test(data_resolution=data_resolution, df_test=df_dict[constants.TEST])
+    # test(data_resolution=data_resolution, df_test=df_dict[constants.TEST])
 
     dummy = -32
 
