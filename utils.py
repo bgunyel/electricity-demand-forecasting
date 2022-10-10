@@ -304,3 +304,10 @@ def train_test_val_split(data_resolution):
         raise Exception('Unsupported data resolution')
 
     return out_dict
+
+
+def generate_wandb_run_name(root):
+    time_now = datetime.datetime.now()
+    time_now_str = time_now.strftime(format='%Y-%m-%d_%H:%M:%S')
+    out = root + '__' + time_now_str
+    return out

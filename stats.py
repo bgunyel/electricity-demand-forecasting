@@ -141,7 +141,7 @@ def examine_weekly_averages_for_each_year():
         start_date = f'{year}-03-01'
 
         if year == 2022:
-            end_date = f'{year}-06-30'
+            end_date = f'{year}-09-30'
         else:
             end_date = f'{year}-12-31'
 

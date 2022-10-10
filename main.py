@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import pickle
 import copy
 import torch
+import wandb
+
 
 import constants
 import utils
@@ -25,6 +27,31 @@ def experimentation():
 
 
 def development():
+
+    start_date = '2022-01-01'
+    end_date = '2022-09-30'
+
+    df_hourly = utils.read_demand_data(start_date=start_date, end_date=end_date, data_folder=constants.EPIAS_FOLDER)
+
+    plt.figure(figsize=(18, 8))
+    plt.plot(df_hourly.index, df_hourly[constants.CONSUMPTION], label='Hourly')
+    plt.xticks(rotation=45)
+    plt.grid(visible=True)
+    plt.title('Hourly Electricity Demand (MWh)')
+    plt.show()
+
+    run = wandb.init(project="electricity-demand-forecasting",
+                     entity="bertan-gunyel",
+                     name=utils.generate_wandb_run_name(root=constants.WANDB_STATIC_VIS),
+                     group=constants.WANDB_STATIC_VIS)
+    table = wandb.Table(dataframe=df_hourly.reset_index())
+    artifact = wandb.Artifact(name=constants.WANDB_ARTIFACT_STATIC_VIS, type='table')
+    artifact.add(table, constants.WANDB_HOURLY_ELECTRICITY_DEMAND_TABLE)
+    run.log_artifact(artifact)
+    # wandb.log_artifact(artifact)
+    # wandb.log({constants.WANDB_HOURLY_ELECTRICITY_DEMAND_TABLE: table})
+    run.finish()
+
 
     stats.examine_monthly_data()
 
