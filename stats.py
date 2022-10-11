@@ -91,6 +91,17 @@ def examine_covid_impact():
     dummy = -32
 
 
+def examine_daily_averages(start_date, end_date):
+
+    df_hourly = utils.read_demand_data(start_date=start_date, end_date=end_date, data_folder=constants.EPIAS_FOLDER)
+    df_hourly_averages = compute_hourly_averages_for_each_day(df=df_hourly)
+    utils.upload_df_as_wandb_artifact(run_group=constants.WANDB_STATIC_VIS,
+                                      df=df_hourly_averages,
+                                      item_name=constants.WANDB_HOURLY_AVERAGES_TABLE)
+
+    dummy = -32
+
+
 def examine_daily_averages_for_each_year():
     df_dict = utils.read_demand_data_for_all_years()
     hourly_averages_dict = dict()

@@ -6,10 +6,14 @@ OUT_FOLDER: Final = './out/'
 EPIAS_FOLDER: Final = DATA_FOLDER + 'epias/'
 SLIDING_HOLIDAYS_JSON = DATA_FOLDER + 'sliding_holidays.json'
 
+WANDB_PROJECT_NAME: Final = 'electricity-demand-forecasting'
+WANDB_USER_NAME: Final = 'bertan-gunyel'
 WANDB_DYNAMIC_VIS: Final = 'dynamic-vis'
 WANDB_STATIC_VIS: Final = 'static-vis'
-WANDB_HOURLY_ELECTRICITY_DEMAND_TABLE: Final = 'hourly-electricity-demand-table'
 WANDB_ARTIFACT_STATIC_VIS: Final = WANDB_STATIC_VIS + '_artifact'
+WANDB_HOURLY_ELECTRICITY_DEMAND_TABLE: Final = 'hourly-electricity-demand-table'
+WANDB_HOURLY_AVERAGES_TABLE: Final = 'hourly-averages-table'
+
 
 CONSUMPTION: Final = 'Consumption (MWh)'
 HOLIDAY: Final = 'holiday'
