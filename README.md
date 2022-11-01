@@ -2,6 +2,8 @@
 
 ***This project is being actively developed. Stay tuned!***
 
+***Project documentation is being carried to Weights&Biases. [Report link](https://wandb.ai/bertan-gunyel/electricity-demand-forecasting/reports/Electricity-Demand-Forecasting-in-Turkish-Market--VmlldzoyNzU1NDgx?accessToken=1d6c4ddqts8idgrv52ecgav1348e1kodzgealnb6t8wn99v758e4p79jt9cji5ux)***
+
 ## Table of Contents
 * [Introduction](#introduction)
 * [Data Analysis](#data-analysis)
