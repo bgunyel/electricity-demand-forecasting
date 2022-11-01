@@ -31,7 +31,7 @@ def examine_covid_impact():
     end_date_during_covid = '2020-12-31'
 
     start_date_after_covid = '2021-01-01'
-    end_date_after_covid = '2022-06-30'
+    end_date_after_covid = '2022-09-30'
 
     df_before = utils.read_demand_data(start_date=start_date_before_covid,
                                        end_date=end_date_before_covid,
@@ -50,6 +50,16 @@ def examine_covid_impact():
     hourly_averages_before = compute_hourly_averages_for_each_day(df_before)
     hourly_averages_during = compute_hourly_averages_for_each_day(df_during)
     hourly_averages_after = compute_hourly_averages_for_each_day(df_after)
+
+    utils.upload_df_as_wandb_artifact(run_group=constants.WANDB_STATIC_VIS,
+                                      df=hourly_averages_before,
+                                      item_name=constants.WANDB_HOURLY_AVERAGES_TABLE_BEFORE_COVID)
+    utils.upload_df_as_wandb_artifact(run_group=constants.WANDB_STATIC_VIS,
+                                      df=hourly_averages_during,
+                                      item_name=constants.WANDB_HOURLY_AVERAGES_TABLE_DURING_COVID)
+    utils.upload_df_as_wandb_artifact(run_group=constants.WANDB_STATIC_VIS,
+                                      df=hourly_averages_after,
+                                      item_name=constants.WANDB_HOURLY_AVERAGES_TABLE_AFTER_COVID)
 
     hourly_averages_all = compute_hourly_averages_for_each_day(df_all)
 

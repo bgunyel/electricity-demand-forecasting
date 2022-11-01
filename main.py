@@ -8,7 +8,6 @@ import copy
 import torch
 import wandb
 
-
 import constants
 import utils
 import stats
@@ -27,6 +26,7 @@ def experimentation():
 
 
 def development():
+    stats.examine_daily_averages_for_each_year()
 
     start_date = '2022-01-01'
     end_date = '2022-09-30'
@@ -37,7 +37,6 @@ def development():
                                       item_name=constants.WANDB_HOURLY_ELECTRICITY_DEMAND_TABLE)
 
     dummy = -32
-
 
 
 def train(data_resolution, df_train, df_validation):
@@ -60,10 +59,23 @@ def train(data_resolution, df_train, df_validation):
                                       constants.OUTPUT_SEQUENCE_LENGTH: 7}}
 
     model_handler = model.ModelHandler(model_params=model_params[data_resolution])
-    model_handler.train(df_train=df_train,
-                        df_validation=df_validation,
-                        data_resolution=data_resolution,
-                        param_dict=train_params[data_resolution])
+    # model_handler.train(df_train=df_train,
+    #                     df_validation=df_validation,
+    #                     data_resolution=data_resolution,
+    #                     param_dict=train_params[data_resolution])
+
+    start_date = '2017-01-01'
+    end_date = '2022-09-30'
+
+    df_hourly = utils.read_demand_data(start_date=start_date,
+                                       end_date=end_date,
+                                       data_folder=constants.EPIAS_FOLDER)
+
+    model_handler.train_k_fold(df=df_hourly,
+                               data_resolution=data_resolution,
+                               num_train_months=12,
+                               num_val_months=6,
+                               months_stride=6)
 
 
 def test(data_resolution, df_test):
@@ -87,7 +99,7 @@ def test(data_resolution, df_test):
     percent_error_vec_after_each_epoch = np.zeros([len(model_file_path_list), 24])
 
     for idx, model_file_name in enumerate(model_file_path_list):
-        print(f'Epoch: {idx+1} -- {model_file_name} @ {datetime.datetime.now()}')
+        print(f'Epoch: {idx + 1} -- {model_file_name} @ {datetime.datetime.now()}')
         model_file_path = os.path.join(constants.OUT_FOLDER, model_file_name)
         handler = model.ModelHandler(model_params=None)
         handler.load_model(model_file_path=model_file_path)
@@ -99,7 +111,6 @@ def test(data_resolution, df_test):
         percent_error = np.mean(percent_error_vec)
         percent_error_after_each_epoch[idx] = percent_error
         print(f'Percent Error: {percent_error}')
-
 
     model_file_path = './out/model_handler_2022-07-15 02:09:18.373973.pkl'
     handler = model.ModelHandler(model_params=None)
@@ -126,8 +137,6 @@ def test(data_resolution, df_test):
 
     '''
 
-
-
     dummy = -32
 
 
@@ -138,8 +147,8 @@ def main(params):
     df_dict = utils.train_test_val_split(data_resolution=data_resolution)
 
     # experimentation()
-    development()
-    # train(data_resolution=data_resolution, df_train=df_dict[constants.TRAIN], df_validation=df_dict[constants.VALIDATION])
+    # development()
+    train(data_resolution=data_resolution, df_train=df_dict[constants.TRAIN], df_validation=df_dict[constants.VALIDATION])
     # test(data_resolution=data_resolution, df_test=df_dict[constants.TEST])
 
     dummy = -32

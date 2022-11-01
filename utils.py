@@ -333,3 +333,11 @@ def upload_as_wandb_artifact(run_group, item, item_name):
 def upload_df_as_wandb_artifact(run_group, df, item_name):
     table = wandb.Table(dataframe=df.reset_index())
     upload_as_wandb_artifact(run_group=run_group, item=table, item_name=item_name)
+
+
+def increment_months(start_date, months):
+    m = (start_date.month + months) % 12
+    y = start_date.year + (start_date.month + months) // 12
+    d = start_date.day
+    out_date = datetime.date(year=y, month=m, day=d)
+    return out_date

@@ -296,3 +296,39 @@ class ModelHandler:
         model_name = f'./out/model_handler_{datetime.datetime.now()}.pkl'
         with open(model_name, 'wb') as file:
             pickle.dump(self, file, pickle.HIGHEST_PROTOCOL)
+
+
+    def train_k_fold(self, df, data_resolution, num_train_months, num_val_months, months_stride):
+
+        start_date = df.index[0].date()
+        end_date = df.index[-1].date()
+
+        train_start_date = start_date
+        do_train = True
+        fold_idx = 0
+
+        while do_train:
+
+            fold_idx = fold_idx + 1
+            val_start_date = utils.increment_months(start_date=train_start_date, months=num_train_months)
+            train_end_date = val_start_date - datetime.timedelta(days=1)
+            val_end_date = utils.increment_months(start_date=val_start_date, months=num_val_months) - datetime.timedelta(days=1)
+
+            if val_end_date >= end_date:
+                do_train = False
+                val_end_date = end_date
+
+            # Do the work
+            print('')
+            print(f'Fold #{fold_idx}')
+            print(f'Train:    {train_start_date} - {train_end_date}')
+            print(f'Validate: {val_start_date} - {val_end_date}')
+
+            # Update for the next fold
+            train_start_date = utils.increment_months(start_date=train_start_date, months=months_stride)
+
+        print('')
+
+        dummy = -32
+
+
