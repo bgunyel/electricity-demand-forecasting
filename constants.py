@@ -6,6 +6,23 @@ OUT_FOLDER: Final = './out/'
 EPIAS_FOLDER: Final = DATA_FOLDER + 'epias/'
 SLIDING_HOLIDAYS_JSON = DATA_FOLDER + 'sliding_holidays.json'
 
+PJM_FOLDER: Final = DATA_FOLDER + 'pjm/'
+PJM_STATES: Final = ['DE', 'IL', 'IN', 'KY', 'MD', 'MI', 'NJ', 'NC', 'OH', 'PA', 'TN', 'VA', 'WV', 'DC']
+DATE_TIME_UTC: Final = 'datetime_utc'
+DATE_TIME_EPT: Final = 'datetime_ept'
+SUMMER_TIME: Final = 'summer_time'
+
+GHCND_FOLDER: Final = DATA_FOLDER + 'ghcnd/'
+GHCND_STATIONS: Final = GHCND_FOLDER + 'ghcnd-stations.txt'
+ID: Final = 'id'
+STATE: Final = 'state'
+LAT: Final = 'latitude'
+LON: Final = 'longitude'
+ELEV: Final = 'elevation'
+STATE_ID: Final = 'state_id'
+
+BOUNDING_POLYGON: Final = 'bounding polygon'
+
 WANDB_PROJECT_NAME: Final = 'electricity-demand-forecasting'
 WANDB_USER_NAME: Final = 'bertan-gunyel'
 WANDB_DYNAMIC_VIS: Final = 'dynamic-vis'

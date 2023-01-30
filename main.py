@@ -12,6 +12,7 @@ import constants
 import utils
 import stats
 import model
+import map_utils
 
 
 def experimentation():
@@ -26,15 +27,9 @@ def experimentation():
 
 
 def development():
-    stats.examine_daily_averages_for_each_year()
 
-    start_date = '2022-01-01'
-    end_date = '2022-09-30'
-
-    df_hourly = utils.read_demand_data(start_date=start_date, end_date=end_date, data_folder=constants.EPIAS_FOLDER)
-    utils.upload_df_as_wandb_artifact(run_group=constants.WANDB_STATIC_VIS,
-                                      df=df_hourly,
-                                      item_name=constants.WANDB_HOURLY_ELECTRICITY_DEMAND_TABLE)
+    # utils.read_pjm_data(start_year=2022, end_year=2022)
+    map_utils.visualize_pjm_stations()
 
     dummy = -32
 
@@ -143,12 +138,12 @@ def test(data_resolution, df_test):
 def main(params):
     print(params['name'])
 
-    data_resolution = constants.HOURLY
-    df_dict = utils.train_test_val_split(data_resolution=data_resolution)
+    # data_resolution = constants.HOURLY
+    # df_dict = utils.train_test_val_split(data_resolution=data_resolution)
 
     # experimentation()
-    # development()
-    train(data_resolution=data_resolution, df_train=df_dict[constants.TRAIN], df_validation=df_dict[constants.VALIDATION])
+    development()
+    # train(data_resolution=data_resolution, df_train=df_dict[constants.TRAIN], df_validation=df_dict[constants.VALIDATION])
     # test(data_resolution=data_resolution, df_test=df_dict[constants.TEST])
 
     dummy = -32

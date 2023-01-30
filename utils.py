@@ -341,3 +341,38 @@ def increment_months(start_date, months):
     d = start_date.day
     out_date = datetime.date(year=y, month=m, day=d)
     return out_date
+
+
+def read_pjm_data(start_year, end_year):
+
+    file_path = constants.PJM_FOLDER + f'pjm-{start_year}.csv'
+    out_df = pd.read_csv(file_path)
+
+    for y in range(start_year + 1, end_year + 1):
+        file_path = constants.PJM_FOLDER + f'pjm-{y}.csv'
+        df = pd.read_csv(file_path)
+        out_df = pd.concat([out_df, df], axis=0, join='outer')
+        print(file_path)
+
+    out_df[constants.DATE_TIME_UTC] = \
+        out_df['datetime_beginning_utc'].apply(lambda x: datetime.datetime.strptime(x, '%m/%d/%Y %I:%M:%S %p'))
+    out_df[constants.DATE_TIME_EPT] = \
+        out_df['datetime_beginning_ept'].apply(lambda x: datetime.datetime.strptime(x, '%m/%d/%Y %I:%M:%S %p'))
+    out_df[constants.SUMMER_TIME] = \
+        out_df[constants.DATE_TIME_UTC] - out_df[constants.DATE_TIME_EPT] == datetime.timedelta(hours=4)
+
+    return out_df
+
+
+def read_ghcnd_data(country='US'):
+
+    df = pd.read_table(constants.GHCND_STATIONS)
+
+    f = open(constants.GHCND_STATIONS, "r")
+    lines = f.readlines()
+    f.close()
+
+    q = [(t[0:11], t[38:40], float(t[12:20]), float(t[21:30]), float(t[31:37])) for t in lines if t[0:2] == country]
+    df = pd.DataFrame(q, columns=[constants.ID, constants.STATE, constants.LAT, constants.LON, constants.ELEV])
+
+    return df
